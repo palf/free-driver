@@ -1,0 +1,8 @@
+.stack-work
+
+vendor/
+tags
+logs
+resources
+*.log
+credentials

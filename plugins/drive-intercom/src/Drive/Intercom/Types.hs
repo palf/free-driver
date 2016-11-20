@@ -1,0 +1,43 @@
+{-# LANGUAGE DeriveFunctor     #-}
+{-# LANGUAGE DeriveGeneric     #-}
+{-# LANGUAGE OverloadedStrings #-}
+
+module Drive.Intercom.Types
+  ( IntercomF (..)
+  , IntercomCredentials (..)
+  , emptyCredentials
+
+  , module A
+  , module U
+  , module C
+  ) where
+
+import qualified Data.Text as T
+import GHC.Generics
+import Data.Aeson
+
+import Drive.Intercom.Types.Admins       as A
+import Drive.Intercom.Types.Users        as U
+import Drive.Intercom.Types.Conversation as C
+
+
+data IntercomF a
+  = ListUsers ([UserID] -> a)
+  | ListAdmins ([Admin] -> a)
+  | ListConversations ([ConversationID] -> a)
+  | GetUser UserID (User -> a)
+  | GetAdmin AdminID (Admin -> a)
+  | GetConversation ConversationID (Conversation -> a)
+  deriving (Functor)
+
+
+newtype IntercomCredentials = IntercomCredentials
+  { authorization :: T.Text
+  } deriving (Show, Eq, Generic)
+
+instance FromJSON IntercomCredentials
+
+emptyCredentials :: IntercomCredentials
+emptyCredentials = IntercomCredentials
+  { authorization = mempty
+  }
