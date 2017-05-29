@@ -28,7 +28,7 @@ subheader t = putStrLn ("\n-- " <> t <> "\n")
 
 readPageTitle :: D.Free B.BrowserF Tx.Text
 readPageTitle = do
-  B.goToUrl (B.Url "https://www.fish.com/")
+  B.goToUrl (B.Url "https://www.google.com/")
   B.readTitle
 
 

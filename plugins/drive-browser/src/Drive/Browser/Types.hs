@@ -41,8 +41,10 @@ deriving instance ToJSON Url
 
 data BrowserF a
   = GoToUrl Url a
+  | Refresh a
   | ReadTitle (T.Text -> a)
   | ClickOn Ref a
+  | Clear Ref a
   | SendText Ref T.Text a
   | PressEnter Ref a
   | ReadText Ref (T.Text -> a)
@@ -63,8 +65,10 @@ instance (ToJSON a) => ToJSON (BrowserF a) where
 
 browserToDescribeI :: (BrowserF -< DescribeF) a
 browserToDescribeI (GoToUrl (Url u) a) = logGoToUrl u    $> a
+browserToDescribeI (Refresh a)         = logRefresh      $> a
 browserToDescribeI (ReadTitle a)       = logReadTitle    $> (a "some page title")
 browserToDescribeI (ClickOn r a)       = logClick r      $> a
+browserToDescribeI (Clear r a)         = logClear r      $> a
 browserToDescribeI (SendText r t a)    = logSendText r t $> a
 browserToDescribeI (PressEnter r a)    = logPressEnter r $> a
 browserToDescribeI (ReadText r a)      = logReadText r   $> (a "from read text")
@@ -75,6 +79,10 @@ logGoToUrl :: String -> D.Free DescribeF ()
 logGoToUrl u
   = verbose ("open (" <> T.pack u <> ")")
 
+logRefresh :: D.Free DescribeF ()
+logRefresh
+  = verbose "refresh"
+
 logReadTitle :: D.Free DescribeF ()
 logReadTitle
   = verbose "read page title"
@@ -82,6 +90,10 @@ logReadTitle
 logClick :: Ref -> D.Free DescribeF ()
 logClick r
   = verbose ("click (" <> showRef r <> ")")
+
+logClear :: Ref -> D.Free DescribeF ()
+logClear r
+  = verbose ("clear (" <> showRef r <> ")")
 
 logSendText :: Ref -> T.Text -> D.Free DescribeF ()
 logSendText r t
@@ -105,8 +117,10 @@ type SupportsBrowser m = (W.Cl.WebDriver m, IOC.MonadIO m)
 
 execBrowser :: (SupportsBrowser m) => BrowserF a -> m a
 execBrowser (GoToUrl (Url u) a) = a <$  C.openPage u
+execBrowser (Refresh a)         = a <$  C.refresh
 execBrowser (ReadTitle a)       = a <$> C.readTitle
 execBrowser (ClickOn r a)       = a <$  C.click r
+execBrowser (Clear r a)         = a <$  C.clear r
 execBrowser (SendText r t a)    = a <$  C.sendKeys r t
 execBrowser (PressEnter r a)    = a <$  C.pressEnter r
 execBrowser (ReadText r a)      = a <$> C.getText r

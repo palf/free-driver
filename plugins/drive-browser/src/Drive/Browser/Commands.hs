@@ -3,8 +3,10 @@
 
 module Drive.Browser.Commands
   ( openPage
+  , refresh
   , readTitle
   , click
+  , clear
   , sendKeys
   , pressEnter
   , getText
@@ -24,12 +26,20 @@ openPage :: (W.Cl.WebDriver m) => String -> m ()
 openPage = W.Com.openPage
 
 
+refresh :: (W.Cl.WebDriver m) => m ()
+refresh = W.Com.refresh
+
+
 readTitle :: (W.Cl.WebDriver m) => m T.Text
 readTitle = W.Com.getTitle
 
 
 click :: (W.Cl.WebDriver m) => Ref -> m ()
 click r = withElement r W.Com.click
+
+
+clear :: (W.Cl.WebDriver m) => Ref -> m ()
+clear r = withElement r W.Com.clearInput
 
 
 sendKeys :: (W.Cl.WebDriver m) => Ref -> T.Text -> m ()
@@ -45,7 +55,7 @@ getText r = withElement r W.Com.getText
 
 
 delay :: (IOC.MonadIO m) => Int -> m ()
-delay n = IOC.liftIO $ Cr.threadDelay (1000000 * n) 
+delay n = IOC.liftIO $ Cr.threadDelay (1000000 * n)
 
 -- private
 
