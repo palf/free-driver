@@ -7,12 +7,14 @@
 
 module Drive.HTTP.Handlers
   ( SupportsNetwork
+
+  , httpToDescribe
+  , httpUriToDescribe
+  , httpHeaderToDescribe
+
   , execHttp
   , execHttpUri
   , execHttpHeader
-  , httpToLog
-  , httpUriToDescribe
-  , httpHeaderToLog
   ) where
 
 import           Control.Monad.Reader
@@ -33,8 +35,8 @@ import           Network.HTTP.Client (HttpException)
 type SupportsNetwork m = (IOC.MonadIO m)
 
 
-httpToLog :: HttpF b -> Free DescribeF b
-httpToLog (Get _o u a)
+httpToDescribe :: HttpF b -> Free DescribeF b
+httpToDescribe (Get _o u a)
   = a D.empty <$ verbose message
     where
       message = "getting \"" <> T.pack (u <> "\"")
@@ -51,8 +53,9 @@ httpUriToDescribe x (GetUri _o u a)
     where
       message y = "getting \"" <> T.pack (u y <> "\"")
 
-httpHeaderToLog :: t -> HttpHeaderF t b -> Free DescribeF b
-httpHeaderToLog x (GetOptions o u a)
+
+httpHeaderToDescribe :: t -> HttpHeaderF t b -> Free DescribeF b
+httpHeaderToDescribe x (GetOptions o u a)
   = a D.empty <$ verbose (message x)
     where
       message y
@@ -81,7 +84,11 @@ execHttpUri (GetUri opts u a) = do
   (fmap . fmap) (a . Right) (runGet opts u')
 
 
-execHttpHeader :: (IOC.MonadIO m, MonadReader y m) => HttpHeaderF y a -> m a
+execHttpHeader
+  :: (IOC.MonadIO m, MonadReader y m)
+  => HttpHeaderF y a
+  -> m (Either HttpError a)
+
 execHttpHeader (GetOptions o u a) = do
   y <- ask
   let opts = o y
@@ -90,7 +97,7 @@ execHttpHeader (GetOptions o u a) = do
     Left _ -> undefined
     Right t' -> do
         liftIO $ print t'
-        pure (a t')
+        pure (Right $ a t')
 
 
 runGet :: (MonadIO m) => W.Options -> String -> m (Either HttpError D.ByteString)

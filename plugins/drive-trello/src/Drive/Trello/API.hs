@@ -1,10 +1,12 @@
+{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE FlexibleContexts #-}
+
 module Drive.Trello.API
-  ( getBoards
-  ) where
+   where
 
+import Control.Monad.Free.TH
+import Control.Monad.Free
 import Drive.Trello.Types
-import Drive (Free, liftF)
 
 
-getBoards :: User -> Free TrelloF [Board]
-getBoards u = liftF $ GetBoards u id
+makeFree ''TrelloF

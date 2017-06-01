@@ -24,9 +24,9 @@ library
                      , aeson
                      , bytestring
                      , comonad
+                     , drive-base
                      , drive-describe
                      , free
-                     , drive-base
                      , lens
                      , mtl
                      , text

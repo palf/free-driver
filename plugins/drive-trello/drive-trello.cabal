@@ -20,17 +20,17 @@ library
   build-depends:       base >= 4.7 && < 5
                      , aeson
                      , bytestring
+                     , comonad
+                     , containers
                      , drive-base
                      , drive-describe
                      , drive-http
-                     , comonad
                      , free
                      , lens
                      , mtl
-                     , containers
-                     , vector
                      , text
                      , transformers
+                     , vector
                      , wreq
   default-language:    Haskell2010
 

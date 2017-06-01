@@ -1,69 +1,62 @@
 module Examples.Intercom.Interpreters
-  ( verboseLogging
-  , debugExecute
-  , deepExecute
-  ) where
+   where
 
-import Control.Monad.Reader
+import qualified Control.Monad.Reader as R
 import qualified Drive                as D
 import qualified Drive.HTTP           as H
 import qualified Drive.Describe            as D
-import qualified Drive.Intercom       as I
+import qualified Drive.Intercom         as I
+
+import Control.Monad      (void)
+import Control.Monad.Free (Free(..))
 
 
-type DoubleLog = D.DescribeF D.:+: D.DescribeF
-type CredReq = H.HttpHeaderF I.IntercomCredentials
-type LogCred = D.DescribeF D.:+: CredReq
-type DoubleLogCred = DoubleLog D.:+: CredReq
+type DescribeP     = D.Free D.DescribeF
+type HttpIntercomP = D.Free (H.HttpHeaderF I.IntercomCredentials)
+type IntercomP     = D.Free I.IntercomF
+type HError        = H.HttpError
+type IError        = I.IntercomError
 
 
-verboseLogging
-  :: ( D.Interpreter I.IntercomF DoubleLog a
-     , DoubleLog a -> IO a
-     )
-
-verboseLogging = (i, r)
-  where
-    i = D.sumI
-          I.intercomToDescribeI
-          (D.composeI (H.httpHeaderToLog I.emptyCredentials) I.intercomToNetworkI)
-
-    r = D.bimapI D.execDescribe D.execDescribe
+ff :: Monad m => (forall x. f x -> m x) -> D.Free f a -> m a
+ff = D.foldFree
 
 
-debugExecute
-  :: ( D.Interpreter I.IntercomF LogCred a
-     , I.IntercomCredentials -> LogCred a -> IO a
-     )
-
-debugExecute = (i, r)
-  where
-    i = D.sumI
-          I.intercomToDescribeI
-          I.intercomToNetworkI
-
-    r c = D.bimapI
-          D.execDescribe
-          (\x -> runReaderT (H.execHttpHeader x) c)
+fe :: Monad m => (forall x. t x -> m (Either e x)) -> Free t a -> m (Either e a)
+fe = D.foldEitherFree
 
 
-deepExecute
-  :: ( D.Interpreter I.IntercomF DoubleLogCred a
-     , I.IntercomCredentials -> DoubleLogCred a -> IO a
-     )
+asDebug :: IntercomP a -> DescribeP a
+asDebug = ff I.intercomToDescribeI
 
-deepExecute = (i, r)
-  where
-    i = D.sumI
-          (D.sumI
-            I.intercomToDescribeI
-            (D.composeI (H.httpHeaderToLog I.emptyCredentials) I.intercomToNetworkI)
-          )
-          I.intercomToNetworkI
 
-    r c = D.bimapI
-          (D.bimapI
-            D.execDescribe
-            D.execDescribe
-          )
-          (\x -> runReaderT (H.execHttpHeader x) c)
+asHttp :: IntercomP a -> HttpIntercomP (Either IError a)
+asHttp = fe I.intercomToNetworkI
+
+
+httpAsDescribe :: I.IntercomCredentials -> HttpIntercomP a -> DescribeP a
+httpAsDescribe auth = ff (H.httpHeaderToDescribe auth)
+
+
+asVerbose
+  :: IntercomP a
+  -> R.ReaderT I.IntercomCredentials DescribeP (Either IError a)
+
+asVerbose p
+  = R.ask >>= \auth -> R.lift $ httpAsDescribe auth $ asHttp p
+
+
+runDescribe :: (R.MonadIO m) => DescribeP a -> m ()
+runDescribe = void . ff D.execDescribe
+
+
+runDescribeR :: (R.MonadIO m, R.MonadReader r m) => R.ReaderT r DescribeP a -> m ()
+runDescribeR p = R.ask >>= void . ff D.execDescribe . R.runReaderT p
+
+
+runHttp
+  :: (R.MonadIO m, R.MonadReader I.IntercomCredentials m)
+  => HttpIntercomP a
+  -> m (Either HError a)
+
+runHttp = fe H.execHttpHeader

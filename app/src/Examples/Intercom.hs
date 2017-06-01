@@ -3,22 +3,15 @@ module Main
   ) where
 
 import qualified Data.Yaml            as Y
-import qualified Drive                as D
-import qualified Drive.Intercom       as I
+import Control.Monad.Reader
 import Examples.Intercom.Programs
 import Examples.Intercom.Interpreters
+
 
 data IntercomError
   = NoCredsError
   | Bored
   deriving (Show, Eq)
-
-
-type IntercomP a = D.Free I.IntercomF a
-
-
-ff :: Monad m => (forall x. f x -> m x) -> D.Free f a -> m a
-ff = D.foldFree
 
 
 main :: IO ()
@@ -29,19 +22,23 @@ main = runIntercomProgram p >>= print
 
 runIntercomProgram
   :: IntercomP a
-  -> IO (Either IntercomError a)
+  -> IO
+       ( Either IntercomError
+         ( Either HError
+           ( Either IError a )
+         )
+       )
 
 runIntercomProgram p = do
   a <- Y.decodeFile "./credentials/intercom.yaml"
 
   case a of
     Nothing -> pure (Left NoCredsError)
-    Just c  -> Right <$> runIntercom c p
+    Just c  -> do
+      r <- runReaderT (runProg p) c
+      pure (Right r)
 
   where
-    -- (i, r) = verboseLogging
-    (i, r) = debugExecute
-
-    runIntercom :: I.IntercomCredentials -> IntercomP a -> IO a
-    runIntercom c = ff (r c) . ff i
-
+    runProg p' = do
+      runDescribeR (asVerbose p')
+      runHttp (asHttp p')

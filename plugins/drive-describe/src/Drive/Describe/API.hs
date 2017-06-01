@@ -1,6 +1,5 @@
 module Drive.Describe.API
-  ( mkDescribe
-  , debug
+  ( debug
   , verbose
   , warn
   ) where

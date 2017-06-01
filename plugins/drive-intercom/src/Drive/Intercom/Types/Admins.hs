@@ -29,7 +29,7 @@ data AdminsResponse = AdminsResponse
 
 instance FromJSON AdminsResponse where
   parseJSON = withObject "adminResponse" $ \v -> do
-    aPages' <- v .: "pages"
+    aPages' <- v .:? "pages"
     admins' <- v .: "admins"
 
     pure AdminsResponse

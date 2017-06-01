@@ -110,6 +110,7 @@ executable drive-intercom
                      , drive-intercom
                      , drive-describe
                      , drive-http
+                     , free
                      , yaml
                      , text
                      , mtl

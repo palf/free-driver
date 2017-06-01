@@ -60,10 +60,6 @@ httpAsDescribe :: T.TrelloAuth -> HttpTrelloP a -> DescribeP a
 httpAsDescribe auth = ff (H.httpUriToDescribe auth)
 
 
--- asVerbose :: T.TrelloAuth -> TrelloP a -> DescribeP (Either TError a)
--- asVerbose auth = httpAsDescribe auth . asHttp
-
-
 asVerbose
   :: TrelloP a
   -> R.ReaderT T.TrelloAuth DescribeP (Either TError a)

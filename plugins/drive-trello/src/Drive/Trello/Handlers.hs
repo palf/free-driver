@@ -10,12 +10,11 @@ module Drive.Trello.Handlers
   , opts
   ) where
 
-import qualified Data.Text    as T
-import qualified Drive        as D
-import qualified Network.Wreq as W
-import qualified Drive.Describe    as D
-import qualified Drive.HTTP   as H
-
+import qualified Data.Text      as T
+import qualified Drive          as D
+import qualified Drive.Describe as D
+import qualified Drive.HTTP     as H
+import qualified Network.Wreq   as W
 
 import Drive.Trello.Types
 import Control.Lens
@@ -24,7 +23,7 @@ import Data.Monoid ((<>))
 import Data.Functor (($>))
 
 
-type LogP = D.Free D.DescribeF
+type DescribeP   = D.Free D.DescribeF
 type HttpTrelloP = D.Free (H.HttpUriF TrelloAuth)
 
 
@@ -34,7 +33,7 @@ data TrelloError
   deriving (Show)
 
 
-trelloToDescribeI :: TrelloF a -> LogP a
+trelloToDescribeI :: TrelloF a -> DescribeP a
 trelloToDescribeI (GetBoards u f)
   = D.debug ("getting boards for user \"" <> showUser u <> "\"") $> f []
 

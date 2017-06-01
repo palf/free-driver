@@ -32,9 +32,9 @@ fetchAdmin c
   = I.adminName <$> I.getAdmin (I.AdminID c)
 
 
-fetchAllAdmins :: IntercomP [I.Admin]
+fetchAllAdmins :: IntercomP [T.Text]
 fetchAllAdmins
-  = I.listAdmins
+  = (fmap . fmap) I.adminName I.listAdmins
 
 
 fetchAllConversations :: IntercomP [I.ConversationID]

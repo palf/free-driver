@@ -16,10 +16,10 @@ library
   hs-source-dirs:      src
   exposed-modules:     Drive.File
   build-depends:       base >= 4.7 && < 5
-                     , drive-base
                      , aeson
                      , bytestring
                      , comonad
+                     , drive-base
                      , free
                      , lens
                      , mtl

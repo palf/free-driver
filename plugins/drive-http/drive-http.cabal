@@ -24,16 +24,16 @@ library
                      , comonad
                      , drive-base
                      , drive-describe
-                     , http-types
                      , exceptions
-                     , lens
-                     , http-client
                      , free
+                     , http-client
+                     , http-client
+                     , http-types
+                     , lens
                      , mtl
                      , text
                      , transformers
                      , wreq
-                     , http-client
   default-language:    Haskell2010
 
 

@@ -10,20 +10,19 @@ module Drive.HTTP.API
   , getRawOpts
   ) where
 
-
 import           Drive.HTTP.Types
+import           Control.Monad.Free.TH
+import           Control.Monad.Free
 
-import qualified Data.Aeson as Aeson
+import qualified Data.Aeson             as Aeson
 import qualified Data.ByteString.Lazy   as D
 import qualified Network.Wreq           as W
-
-import Control.Monad.Free.TH
-import Control.Monad.Free
 
 import           Drive          (Free, liftF)
 
 
 makeFree ''HttpUriF
+
 
 get :: (Aeson.FromJSON a) => W.Options -> String -> Free HttpF (Maybe a)
 get opts u = Aeson.decode <$> getRaw opts u
@@ -31,6 +30,7 @@ get opts u = Aeson.decode <$> getRaw opts u
 
 getRaw :: W.Options -> String -> Free HttpF D.ByteString
 getRaw opts u = liftF (Get opts u id)
+
 
 getRawUrl
   :: forall x.
