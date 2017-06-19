@@ -66,12 +66,12 @@ instance (ToJSON a) => ToJSON (BrowserF a) where
 browserToDescribeI :: (BrowserF -< DescribeF) a
 browserToDescribeI (GoToUrl (Url u) a) = logGoToUrl u    $> a
 browserToDescribeI (Refresh a)         = logRefresh      $> a
-browserToDescribeI (ReadTitle a)       = logReadTitle    $> (a "some page title")
+browserToDescribeI (ReadTitle a)       = logReadTitle    $> a "some page title"
 browserToDescribeI (ClickOn r a)       = logClick r      $> a
 browserToDescribeI (Clear r a)         = logClear r      $> a
 browserToDescribeI (SendText r t a)    = logSendText r t $> a
 browserToDescribeI (PressEnter r a)    = logPressEnter r $> a
-browserToDescribeI (ReadText r a)      = logReadText r   $> (a "from read text")
+browserToDescribeI (ReadText r a)      = logReadText r   $> a "from read text"
 browserToDescribeI (Sleep n a)         = logSleep n      $> a
 
 

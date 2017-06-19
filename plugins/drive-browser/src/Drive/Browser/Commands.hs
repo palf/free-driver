@@ -2,8 +2,8 @@
 {-# LANGUAGE KindSignatures #-}
 
 module Drive.Browser.Commands
-  ( openPage
-  , refresh
+  ( W.Com.openPage
+  , W.Com.refresh
   , readTitle
   , click
   , clear
@@ -21,13 +21,6 @@ import qualified Test.WebDriver.Commands        as W.Com
 import qualified Test.WebDriver.Common.Keys     as W.Keys
 
 import Drive.Browser.Ref
-
-openPage :: (W.Cl.WebDriver m) => String -> m ()
-openPage = W.Com.openPage
-
-
-refresh :: (W.Cl.WebDriver m) => m ()
-refresh = W.Com.refresh
 
 
 readTitle :: (W.Cl.WebDriver m) => m T.Text

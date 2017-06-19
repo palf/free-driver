@@ -89,18 +89,18 @@ intercomToNetworkI (GetUser (UserID u) a) = do
   let r' = eitherDecode r :: Either String User
   pure $ case r' of
     Left e -> Left (IntercomError e)
-    Right v -> Right $ a $ v
+    Right v -> Right $ a v
 
 intercomToNetworkI (GetAdmin (AdminID u) a) = do
   r <- H.getRawOpts mkOpts ("https://api.intercom.io/admins/" <> T.unpack u)
   let r' = eitherDecode r :: Either String Admin
   pure $ case r' of
     Left e -> Left (IntercomError e)
-    Right v -> Right $ a $ v
+    Right v -> Right $ a v
 
 intercomToNetworkI (GetConversation (ConversationID c) a) = do
   r <- H.getRawOpts mkOpts ("https://api.intercom.io/conversations/" <> T.unpack c)
   let r' = eitherDecode r :: Either String Conversation
   pure $ case r' of
     Left e -> Left (IntercomError e)
-    Right v -> Right $ a $ v
+    Right v -> Right $ a v
