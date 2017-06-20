@@ -7,8 +7,13 @@ module Drive.Intercom.Handlers
   ( IntercomError (..)
   , intercomToDescribeI
   , intercomToNetworkI
+
+  , listAllConversations
   ) where
 
+import Drive.Intercom.Types
+
+import qualified Data.Bifunctor     as Bi
 import qualified Data.Text          as T
 import qualified Data.Text.Encoding as T
 import qualified Drive              as D
@@ -16,10 +21,11 @@ import qualified Drive.Describe     as D
 import qualified Drive.HTTP         as H
 import qualified Network.Wreq       as W
 
-import Drive.Intercom.Types
 import Control.Lens
+import Control.Monad
 import Data.Aeson
 import Data.Monoid ((<>))
+import Data.Functor (($>))
 
 
 type DescribeP     = D.Free D.DescribeF
@@ -28,22 +34,22 @@ type HttpIntercomP = D.Free (H.HttpHeaderF IntercomCredentials)
 
 intercomToDescribeI :: IntercomF a -> DescribeP a
 intercomToDescribeI (ListUsers a)
-  = a [] <$ D.debug "listing customers"
+  = D.debug "listing customers" $> a []
 
 intercomToDescribeI (ListAdmins a)
-  = a [] <$ D.debug "listing admins"
+  = D.debug "listing admins" $> a []
 
 intercomToDescribeI (ListConversations a)
-  = a [] <$ D.debug "listing conversations"
+  = D.debug "listing conversations" $> a []
 
 intercomToDescribeI (GetUser (UserID u) a)
-  = a nullUser <$ D.debug ("requesting user (" <> u <> ")")
+  = D.debug ("requesting user (" <> u <> ")") $> a nullUser
 
 intercomToDescribeI (GetAdmin (AdminID u) a)
-  = a nullAdmin <$ D.debug ("requesting user (" <> u <> ")")
+  = D.debug ("requesting user (" <> u <> ")") $> a nullAdmin
 
 intercomToDescribeI (GetConversation (ConversationID c) a)
-  = a nullConversation <$ D.debug ("requesting conversation (" <> c <> ")")
+  = D.debug ("requesting conversation (" <> c <> ")") $> a nullConversation
 
 
 mkOpts :: IntercomCredentials -> W.Options
@@ -63,44 +69,62 @@ intercomToNetworkI :: IntercomF a -> HttpIntercomP (Either IntercomError a)
 -- TODO: read rate limit
 -- TODO: use the `scroll` endpoint
 
-intercomToNetworkI (ListUsers a) = do
-  r <- H.getRawOpts mkOpts "https://api.intercom.io/users"
-  let r' = eitherDecode r :: Either String UsersResponse
-  pure $ case r' of
-    Left e -> Left (IntercomError e)
-    Right v -> Right $ a $ map userID (users v)
+intercomToNetworkI (ListUsers a)
+  = fmap a <$> mkIntercomRequest "https://api.intercom.io/users"
 
-intercomToNetworkI (ListAdmins a) = do
-  r <- H.getRawOpts mkOpts "https://api.intercom.io/admins"
-  let r' = eitherDecode r :: Either String AdminsResponse
-  pure $ case r' of
-    Left e  -> Left (IntercomError e)
-    Right v -> Right $ a $ admins v
+intercomToNetworkI (ListAdmins a)
+  = fmap a <$> mkIntercomRequest "https://api.intercom.io/admins"
 
-intercomToNetworkI (ListConversations a) = do
-  r <- H.getRawOpts mkOpts "https://api.intercom.io/conversations"
-  let r' = eitherDecode r :: Either String ConversationsResponse
-  pure $ case r' of
-    Left e -> Left (IntercomError e)
-    Right v -> Right $ a $ map convID (conversations v)
+intercomToNetworkI (ListConversations a)
+  -- = fmap a <$> mkIntercomRequest "https://api.intercom.io/conversations"
+  = fmap a <$> listAllConversations
 
-intercomToNetworkI (GetUser (UserID u) a) = do
-  r <- H.getRawOpts mkOpts ("https://api.intercom.io/users/" <> T.unpack u)
-  let r' = eitherDecode r :: Either String User
-  pure $ case r' of
-    Left e -> Left (IntercomError e)
-    Right v -> Right $ a v
+intercomToNetworkI (GetUser (UserID u) a)
+  = fmap a <$> mkIntercomRequest ("https://api.intercom.io/users/" <> u)
 
-intercomToNetworkI (GetAdmin (AdminID u) a) = do
-  r <- H.getRawOpts mkOpts ("https://api.intercom.io/admins/" <> T.unpack u)
-  let r' = eitherDecode r :: Either String Admin
-  pure $ case r' of
-    Left e -> Left (IntercomError e)
-    Right v -> Right $ a v
+intercomToNetworkI (GetAdmin (AdminID u) a)
+  = fmap a <$> mkIntercomRequest ("https://api.intercom.io/admins/" <> u)
 
-intercomToNetworkI (GetConversation (ConversationID c) a) = do
-  r <- H.getRawOpts mkOpts ("https://api.intercom.io/conversations/" <> T.unpack c)
-  let r' = eitherDecode r :: Either String Conversation
-  pure $ case r' of
-    Left e -> Left (IntercomError e)
-    Right v -> Right $ a v
+intercomToNetworkI (GetConversation (ConversationID c) a)
+  = fmap a <$> mkIntercomRequest ("https://api.intercom.io/conversations/" <> c)
+
+
+listAllConversations :: HttpIntercomP (Either IntercomError [ConversationID])
+listAllConversations
+  = (fmap . fmap . fmap) convID (runit "https://api.intercom.io/conversations")
+
+  where
+    runit :: T.Text -> HttpIntercomP (Either IntercomError [Conversation])
+    runit u = do
+      fs <- mkIntercomRequest u
+      case fs of
+        Left e  -> pure $ Left e
+        Right v -> do
+          let rs = conversations v
+          maybe
+            (pure $ Right rs)
+            (\l -> mapRight (mappend rs) <$> runit l)
+            (getNextPageLink v)
+
+    getNextPageLink :: ConversationsResponse -> Maybe T.Text
+    getNextPageLink = pages >=> next
+
+
+mkIntercomRequest
+  :: (FromJSON a)
+  => T.Text
+  -> HttpIntercomP (Either IntercomError a)
+
+mkIntercomRequest u
+  = mapLeft IntercomError . eitherDecode
+  <$> H.getRawOpts mkOpts (T.unpack u)
+
+
+mapLeft :: (a -> c) -> Either a b -> Either c b
+mapLeft = Bi.first
+
+mapRight :: (b -> c) -> Either a b -> Either a c
+mapRight = Bi.second
+
+-- mapOver :: (a -> c) -> (b -> d) -> Either a b -> Either c d
+-- mapOver = Bi.bimap

@@ -11,6 +11,7 @@ category:            Web
 build-type:          Simple
 cabal-version:       >=1.10
 
+
 library
   hs-source-dirs:      src
   exposed-modules:     Drive.Intercom
@@ -30,6 +31,7 @@ library
                      , drive-http
                      , free
                      , lens
+                     , monad-loops
                      , mtl
                      , text
                      , transformers

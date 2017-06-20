@@ -48,7 +48,7 @@ httpUriToDescribe
   -> HttpUriF t b
   -> Free DescribeF b
 
-httpUriToDescribe x (GetUri _o u _a)
+httpUriToDescribe x (GetUri _o u a)
   = a (Left NoContent) <$ verbose (message x)
     where
       message y = "getting \"" <> T.pack (u y <> "\"")

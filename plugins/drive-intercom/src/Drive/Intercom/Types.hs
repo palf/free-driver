@@ -7,6 +7,7 @@ module Drive.Intercom.Types
   , IntercomCredentials (..)
   , emptyCredentials
 
+  , module P
   , module A
   , module U
   , module C
@@ -16,6 +17,7 @@ import qualified Data.Text as T
 import GHC.Generics
 import Data.Aeson
 
+import Drive.Intercom.Types.Pagination   as P
 import Drive.Intercom.Types.Admins       as A
 import Drive.Intercom.Types.Users        as U
 import Drive.Intercom.Types.Conversation as C

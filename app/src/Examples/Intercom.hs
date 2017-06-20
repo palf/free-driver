@@ -8,9 +8,8 @@ import Examples.Intercom.Programs
 import Examples.Intercom.Interpreters
 
 
-data IntercomError
+data AppError
   = NoCredsError
-  | Bored
   deriving (Show, Eq)
 
 
@@ -23,7 +22,7 @@ main = runIntercomProgram p >>= print
 runIntercomProgram
   :: IntercomP a
   -> IO
-       ( Either IntercomError
+       ( Either AppError
          ( Either HError
            ( Either IError a )
          )
