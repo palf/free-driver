@@ -12,52 +12,35 @@ import qualified Drive.HTTP           as H
 import qualified Drive.Describe            as D
 import qualified Drive.Trello         as T
 
+import Control.Monad.IO.Class (MonadIO)
 import Control.Monad      (void)
 import Control.Monad.Free (Free(..))
-import Data.Monoid        ((<>))
 import Data.Text          (Text)
 
 
-type DescribeP        = D.Free D.DescribeF
-type HttpTrelloP = D.Free (H.HttpUriF T.TrelloAuth)
-type TrelloP     = D.Free T.TrelloF
+type DescribeP   = Free D.DescribeF
+type HttpTrelloP = Free (H.HttpUriF T.TrelloAuth)
+type TrelloP     = Free T.TrelloF
 type HError      = H.HttpError
 type TError      = T.TrelloError
 
 
-ff :: Monad m => (forall x. f x -> m x) -> D.Free f a -> m a
-ff = D.foldFree
-
-
-fe :: Monad m => (forall x. t x -> m (Either e x)) -> Free t a -> m (Either e a)
-fe = D.foldEitherFree
-
-
-header :: String -> IO ()
-header t = putStrLn ("\n\n# " <> t)
-
-
-subheader :: String -> IO ()
-subheader t = putStrLn ("\n-- " <> t <> "\n")
-
-
 exampleGetTrelloBoardNames :: TrelloP [Text]
 exampleGetTrelloBoardNames = do
-  let user = T.User "jackpalf"
-  bs <- T.getBoards user
-  pure $ fmap T.boardName bs
+  let user = T.User "jackpalfrey3"
+  (fmap T.boardName ) <$> T.getBoards user
 
 
 asDebug :: TrelloP a -> DescribeP a
-asDebug = ff T.trelloToDescribeI
+asDebug = D.foldFree T.trelloToDescribeI
 
 
 asHttp :: TrelloP a -> HttpTrelloP (Either TError a)
-asHttp = fe T.trelloToNetworkI
+asHttp = D.foldEitherFree T.trelloToNetworkI
 
 
 httpAsDescribe :: T.TrelloAuth -> HttpTrelloP a -> DescribeP a
-httpAsDescribe auth = ff (H.httpUriToDescribe auth)
+httpAsDescribe auth = D.foldFree (H.httpUriToDescribe auth)
 
 
 asVerbose
@@ -68,26 +51,24 @@ asVerbose p
   = R.ask >>= \auth -> R.lift $ httpAsDescribe auth $ asHttp p
 
 
-runDescribe :: (R.MonadIO m) => DescribeP a -> m ()
-runDescribe = void . ff D.execDescribe
+runDescribe :: (MonadIO m) => DescribeP a -> m ()
+runDescribe = void . D.foldFree D.execDescribe
 
 
-runDescribeR :: (R.MonadIO m, R.MonadReader r m) => R.ReaderT r DescribeP a -> m ()
-runDescribeR p = R.ask >>= void . ff D.execDescribe . R.runReaderT p
+runDescribeR :: (MonadIO m, R.MonadReader r m) => R.ReaderT r DescribeP a -> m ()
+runDescribeR p = R.ask >>= void . D.foldFree D.execDescribe . R.runReaderT p
 
 
 runHttp
-  :: (R.MonadIO m, R.MonadReader T.TrelloAuth m)
+  :: (MonadIO m, R.MonadReader T.TrelloAuth m)
   => HttpTrelloP a
   -> m (Either HError a)
 
-runHttp = fe H.execHttpUri
+runHttp = D.foldEitherFree H.execHttpUri
 
 
 main :: IO ()
 main = do
-  header "Trello"
-
   trelloDebugDescribe
 
   withTrelloCredentials "credentials/trello.yaml" $ \auth -> do
@@ -98,28 +79,29 @@ main = do
 
 
 withTrelloCredentials :: FilePath -> (T.TrelloAuth -> IO a) -> IO ()
-withTrelloCredentials p f
-  = Y.decodeFile p >>= maybe (putStrLn "could not load trello credentials") (void . f)
+withTrelloCredentials p f =
+  Y.decodeFileEither p >>=
+    either
+      print
+      (void . f)
 
 
 trelloDebugDescribe :: IO ()
-trelloDebugDescribe = do
-  subheader "describe (debug)"
+trelloDebugDescribe =
   run exampleGetTrelloBoardNames >>= print
 
     where
-      run :: (R.MonadIO m) => TrelloP a -> m ()
+      run :: (MonadIO m) => TrelloP a -> m ()
       run = runDescribe . asDebug
 
 
 trelloVerboseDescribe :: T.TrelloAuth -> IO ()
-trelloVerboseDescribe auth = do
-  subheader "describe (verbose)"
+trelloVerboseDescribe auth =
   R.runReaderT (run exampleGetTrelloBoardNames) auth >>= print
 
     where
       run
-        :: (R.MonadIO m, R.MonadReader T.TrelloAuth m)
+        :: (MonadIO m, R.MonadReader T.TrelloAuth m)
         => TrelloP a
         -> m ()
 
@@ -127,13 +109,12 @@ trelloVerboseDescribe auth = do
 
 
 trelloInterleavedDescribe :: T.TrelloAuth -> IO ()
-trelloInterleavedDescribe auth = do
-  subheader "describe (interleaved)"
+trelloInterleavedDescribe auth =
   R.runReaderT (run exampleGetTrelloBoardNames) auth >>= print
 
     where
       run
-        :: (R.MonadIO m, R.MonadReader T.TrelloAuth m)
+        :: (MonadIO m, R.MonadReader T.TrelloAuth m)
         => TrelloP a
         -> m ((), ())
 
@@ -144,13 +125,12 @@ trelloInterleavedDescribe auth = do
 
 
 trelloExecuting :: T.TrelloAuth -> IO ()
-trelloExecuting auth = do
-  subheader "executing"
+trelloExecuting auth =
   R.runReaderT (run exampleGetTrelloBoardNames) auth >>= print
 
     where
       run
-        :: (R.MonadIO m, R.MonadReader T.TrelloAuth m)
+        :: (MonadIO m, R.MonadReader T.TrelloAuth m)
         => TrelloP a
         -> m (Either HError (Either TError a))
 
@@ -158,13 +138,12 @@ trelloExecuting auth = do
 
 
 trelloExecutingInterleavedDescribe :: T.TrelloAuth -> IO ()
-trelloExecutingInterleavedDescribe auth = do
-  subheader "executing with interleaved describe"
-  R.runReaderT (run exampleGetTrelloBoardNames) auth  >>= print
+trelloExecutingInterleavedDescribe auth =
+  R.runReaderT (run exampleGetTrelloBoardNames) auth >>= print
 
     where
       run
-        :: (R.MonadIO m, R.MonadReader T.TrelloAuth m)
+        :: (MonadIO m, R.MonadReader T.TrelloAuth m)
         => TrelloP a
         -> m ((), (), Either HError (Either TError a))
 

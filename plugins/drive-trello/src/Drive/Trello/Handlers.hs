@@ -10,17 +10,17 @@ module Drive.Trello.Handlers
   , opts
   ) where
 
-import qualified Data.Text      as T
-import qualified Drive          as D
-import qualified Drive.Describe as D
-import qualified Drive.HTTP     as H
-import qualified Network.Wreq   as W
+import qualified Data.Text          as T
+import qualified Drive              as D
+import qualified Drive.Describe     as D
+import qualified Drive.HTTP         as H
+import qualified Network.Wreq       as W
 
-import Drive.Trello.Types
-import Control.Lens
-import Data.Aeson
-import Data.Monoid ((<>))
-import Data.Functor (($>))
+import           Control.Lens
+import           Data.Aeson
+import           Data.Functor       (($>))
+import           Data.Monoid        ((<>))
+import           Drive.Trello.Types
 
 
 type DescribeP   = D.Free D.DescribeF

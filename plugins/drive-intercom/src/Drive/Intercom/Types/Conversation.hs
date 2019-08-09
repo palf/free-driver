@@ -1,5 +1,6 @@
 {-# LANGUAGE DeriveGeneric              #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE LambdaCase                 #-}
 {-# LANGUAGE OverloadedStrings          #-}
 
 module Drive.Intercom.Types.Conversation
@@ -10,12 +11,12 @@ module Drive.Intercom.Types.Conversation
   , nullConversation
   ) where
 
-import Data.Aeson.Types
-import GHC.Generics (Generic)
-import qualified Data.Text as T
-import qualified Data.Vector as V
+import           Data.Aeson.Types
+import qualified Data.Text                       as T
+import qualified Data.Vector                     as V
+import           GHC.Generics                    (Generic)
 
-import Drive.Intercom.Types.Pagination
+import           Drive.Intercom.Types.Pagination
 
 
 newtype ConversationID
@@ -43,12 +44,11 @@ data Author = Anon | KnownAdmin String
   deriving (Show, Eq, Ord, Generic)
 
 instance FromJSON Author where
-  parseJSON = withObject "author" $ \v -> do
-    t <- (v .: "type") :: Parser String
-    i <- v .: "id"
-    pure $ case t of
-            "admin" -> KnownAdmin i
-            _-> Anon
+  parseJSON = withObject "author" $
+    \v -> v .: "type"
+    >>= \case
+      "admin" -> v .: "id" >>= KnownAdmin
+      _ -> pure Anon
 
 
 data Conversation = Conversation
@@ -67,13 +67,11 @@ instance FromJSON Conversation where
     t <- m .: "body"
     a <- m .: "author"
 
-    p <- v .:? "conversation_parts" >>= \ps ->
-      case ps of
+    p <- v .:? "conversation_parts" >>= \case
         Nothing -> pure []
-        Just ps' -> do
-          x <- ps' .: "conversation_parts"
-          p <- withArray "Conversation parts" extractParts x
-          pure p
+        Just ps'
+          -> ps' .: "conversation_parts"
+          >>= withArray "Conversation parts" extractParts
 
     let t' = (a, t)
 

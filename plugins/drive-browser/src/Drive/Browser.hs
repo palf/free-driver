@@ -10,7 +10,7 @@ module Drive.Browser
   , runDefaultSession
   ) where
 
-import Drive.Browser.API            as API
-import Drive.Browser.Configuration  as Conf
-import Drive.Browser.Types          as Types
-import Drive.Browser.Ref (Ref (..))
+import           Drive.Browser.API           as API
+import           Drive.Browser.Configuration as Conf
+import           Drive.Browser.Ref           (Ref (..))
+import           Drive.Browser.Types         as Types

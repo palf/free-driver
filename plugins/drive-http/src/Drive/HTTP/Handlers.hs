@@ -1,9 +1,9 @@
 {-# LANGUAGE ConstraintKinds       #-}
-{-# LANGUAGE RankNTypes       #-}
-{-# LANGUAGE FlexibleInstances     #-}
 {-# LANGUAGE FlexibleContexts      #-}
+{-# LANGUAGE FlexibleInstances     #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE OverloadedStrings     #-}
+{-# LANGUAGE RankNTypes            #-}
 
 module Drive.HTTP.Handlers
   ( SupportsNetwork
@@ -17,20 +17,20 @@ module Drive.HTTP.Handlers
   , execHttpHeader
   ) where
 
-import           Control.Monad.Reader
-import           Drive
-import           Drive.HTTP.Types
-import           Drive.Describe
-import           Network.Wreq.Lens
 import qualified Control.Exception      as E
 import qualified Control.Monad.IO.Class as IOC
+import           Control.Monad.Reader
 import qualified Data.ByteString.Lazy   as D
 import qualified Data.Text              as T
+import           Drive
+import           Drive.Describe
+import           Drive.HTTP.Types
 import qualified Network.Wreq           as W
+import           Network.Wreq.Lens
 
-import           Control.Lens        ((^.))
-import           Data.Semigroup      ((<>))
-import           Network.HTTP.Client (HttpException)
+import           Control.Lens           ((^.))
+import           Data.Semigroup         ((<>))
+import           Network.HTTP.Client    (HttpException)
 
 type SupportsNetwork m = (IOC.MonadIO m)
 

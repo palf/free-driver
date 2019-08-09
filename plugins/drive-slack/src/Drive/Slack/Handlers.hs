@@ -10,14 +10,14 @@ module Drive.Slack.Handlers
   ) where
 
 
-import Drive.Slack.Types
+import           Drive.Slack.Types
 
-import qualified Data.Text              as Tx
-import qualified Drive                  as D
-import qualified Drive.Describe              as D
-import qualified Web.Slack as S
-import Data.Functor
-import qualified Data.Yaml as Y
+import           Data.Functor
+import qualified Data.Text         as Tx
+import qualified Data.Yaml         as Y
+import qualified Drive             as D
+import qualified Drive.Describe    as D
+import qualified Web.Slack         as S
 
 
 -- type SupportsSlack m = (IOC.MonadIO m)
@@ -34,7 +34,7 @@ data SlackCredentialsError
 
 slackToLog :: SlackF a -> D.Free D.DescribeF a
 slackToLog (Ping a) = D.debug "ping" $> a
-slackToLog _ = undefined
+slackToLog _        = undefined
 
 
 execSlack :: SlackF a -> IO a
@@ -50,7 +50,7 @@ withSlackCredentials path f
   = getSlackConfig path
   >>= \x ->
       case x of
-        Left e -> pure (Left e)
+        Left e  -> pure (Left e)
         Right r -> Right <$> f r
     -- case c of
     --   Nothing -> pure ()
@@ -62,7 +62,7 @@ getSlackConfig path = do
   r <- getCreds
   case r of
     Just (x:_) -> pure (Right $ mkC x)
-    _ -> pure (Left NotFound)
+    _          -> pure (Left NotFound)
 
    where
      getCreds = Y.decodeFile path :: IO (Maybe [SlackCredentials])

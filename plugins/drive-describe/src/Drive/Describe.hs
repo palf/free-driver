@@ -4,6 +4,6 @@ module Drive.Describe
   , module Handlers
   ) where
 
-import Drive.Describe.Types    as Types
-import Drive.Describe.API      as API
-import Drive.Describe.Handlers as Handlers
+import           Drive.Describe.API      as API
+import           Drive.Describe.Handlers as Handlers
+import           Drive.Describe.Types    as Types

@@ -1,6 +1,6 @@
-{-# LANGUAGE RankNTypes #-}
-{-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE RankNTypes       #-}
+{-# LANGUAGE TemplateHaskell  #-}
 
 module Drive.HTTP.API
   ( W.defaults
@@ -10,15 +10,15 @@ module Drive.HTTP.API
   , getRawOpts
   ) where
 
-import           Drive.HTTP.Types
-import           Control.Monad.Free.TH
 import           Control.Monad.Free
+import           Control.Monad.Free.TH
+import           Drive.HTTP.Types
 
-import qualified Data.Aeson             as Aeson
-import qualified Data.ByteString.Lazy   as D
-import qualified Network.Wreq           as W
+import qualified Data.Aeson            as Aeson
+import qualified Data.ByteString.Lazy  as D
+import qualified Network.Wreq          as W
 
-import           Drive          (Free, liftF)
+import           Drive                 (Free, liftF)
 
 
 makeFree ''HttpUriF

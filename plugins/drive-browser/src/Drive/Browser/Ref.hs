@@ -12,5 +12,5 @@ data Ref
 
 
 showRef :: Ref -> T.Text
-showRef (CSS r) = r
+showRef (CSS r)      = r
 showRef (LinkText r) = r

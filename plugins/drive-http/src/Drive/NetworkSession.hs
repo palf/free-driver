@@ -1,5 +1,6 @@
 {-# LANGUAGE ConstraintKinds       #-}
 {-# LANGUAGE DeriveFunctor         #-}
+{-# LANGUAGE ExplicitNamespaces    #-}
 {-# LANGUAGE FlexibleContexts      #-}
 {-# LANGUAGE FlexibleInstances     #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
@@ -14,18 +15,18 @@ module NetworkSession
   , execNetworkSession
   ) where
 
-import qualified Control.Monad.Free        as F
-import qualified Control.Monad.IO.Class    as IOC
-import qualified Control.Monad.Reader      as R
-import qualified Data.ByteString.Lazy      as D
-import qualified Data.Text                 as T
-import qualified Drive                as D
-import qualified Network.Wreq              as W
-import qualified Network.Wreq.Session      as S
+import qualified Control.Monad.Free     as F
+import qualified Control.Monad.IO.Class as IOC
+import qualified Control.Monad.Reader   as R
+import qualified Data.ByteString.Lazy   as D
+import qualified Data.Text              as T
+import qualified Drive                  as D
+import qualified Network.Wreq           as W
+import qualified Network.Wreq.Session   as S
 
-import Control.Lens ((^.))
-import Data.Monoid ((<>))
-import Drive (type (-<))
+import           Control.Lens           ((^.))
+import           Data.Monoid            ((<>))
+import           Drive                  (type (-<))
 
 
 type Uri = String

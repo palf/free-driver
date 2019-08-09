@@ -1,5 +1,5 @@
-{-# LANGUAGE RankNTypes     #-}
 {-# LANGUAGE KindSignatures #-}
+{-# LANGUAGE RankNTypes     #-}
 
 module Drive.Browser.Commands
   ( W.Com.openPage
@@ -13,14 +13,14 @@ module Drive.Browser.Commands
   , delay
   ) where
 
-import qualified Control.Concurrent             as Cr
-import qualified Control.Monad.IO.Class         as IOC
-import qualified Data.Text                      as T
-import qualified Test.WebDriver.Class           as W.Cl
-import qualified Test.WebDriver.Commands        as W.Com
-import qualified Test.WebDriver.Common.Keys     as W.Keys
+import qualified Control.Concurrent         as Cr
+import qualified Control.Monad.IO.Class     as IOC
+import qualified Data.Text                  as T
+import qualified Test.WebDriver.Class       as W.Cl
+import qualified Test.WebDriver.Commands    as W.Com
+import qualified Test.WebDriver.Common.Keys as W.Keys
 
-import Drive.Browser.Ref
+import           Drive.Browser.Ref
 
 
 readTitle :: (W.Cl.WebDriver m) => m T.Text
@@ -61,5 +61,5 @@ withElement r op = W.Com.findElem (selector r) >>= op
 
 
 selector :: Ref -> W.Com.Selector
-selector (CSS t) = W.Com.ByCSS t
+selector (CSS t)      = W.Com.ByCSS t
 selector (LinkText t) = W.Com.ByLinkText t

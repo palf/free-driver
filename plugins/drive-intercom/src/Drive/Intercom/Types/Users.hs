@@ -5,9 +5,9 @@
 module Drive.Intercom.Types.Users
   where
 
-import Data.Aeson
-import GHC.Generics
-import qualified Data.Text as T
+import           Data.Aeson
+import qualified Data.Text                       as T
+import           GHC.Generics
 
 import qualified Drive.Intercom.Types.Pagination as P
 
@@ -19,7 +19,7 @@ newtype UserID
 
 data UsersResponse = UsersResponse
   { uPages :: Maybe P.Pagination
-  , users :: [User]
+  , users  :: [User]
   } deriving (Show, Generic)
 
 instance FromJSON UsersResponse where

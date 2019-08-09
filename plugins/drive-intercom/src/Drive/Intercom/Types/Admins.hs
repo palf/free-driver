@@ -10,9 +10,9 @@ module Drive.Intercom.Types.Admins
   , adminIDToString
   ) where
 
-import Data.Aeson
-import GHC.Generics
-import qualified Data.Text as T
+import           Data.Aeson
+import qualified Data.Text                       as T
+import           GHC.Generics
 
 import qualified Drive.Intercom.Types.Pagination as P
 
@@ -39,8 +39,8 @@ instance FromJSON AdminsResponse where
 
 
 data Admin = Admin
-  { adminID    :: AdminID
-  , adminName  :: T.Text
+  { adminID   :: AdminID
+  , adminName :: T.Text
   } deriving (Show, Generic)
 
 

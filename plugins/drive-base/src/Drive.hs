@@ -1,3 +1,4 @@
+{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE RankNTypes #-}
 
 module Drive
@@ -9,34 +10,31 @@ module Drive
   , foldMaybeFree
   ) where
 
-import Drive.Interpreter as X
 import qualified Control.Monad.Free as F
+import           Drive.Interpreter  as X
 
 
 newtype EitherT e m a = EitherT {runEitherT :: m (Either e a)}
 
 instance Functor m => Functor (EitherT e m) where
-  fmap f (EitherT m) = EitherT $ fmap (fmap f) m
+  -- fmap f (EitherT m) = EitherT $ (fmap f) <$> m
+  fmap f (EitherT m) = EitherT $  (fmap . fmap) f m
 
 instance Monad m => Applicative (EitherT e m) where
   pure = EitherT . pure . Right
-  EitherT f <*> EitherT v
-    = EitherT $ f
-      >>= \mf -> case mf of
-        Left e  -> pure (Left e)
-        Right k -> v
-          >>= \mv -> case mv of
-            Left e  -> pure (Left e)
-            Right x -> pure (Right (k x))
+  EitherT f <*> EitherT v =
+    EitherT $ f >>= either
+      (pure . Left)
+      -- (\k -> (fmap . fmap) k v)
+      (\k -> (fmap k) <$> v)
 
 
 instance Monad m => Monad (EitherT e m) where
   return = pure
-  EitherT x >>= f = EitherT $ do
-    res <- x
-    case res of
-      Left e -> pure (Left e)
-      Right v -> runEitherT . f $ v
+  EitherT x >>= f =
+    EitherT $ x >>= either
+      (pure . Left)
+      (runEitherT . f)
 
 
 foldEitherFree
@@ -61,7 +59,6 @@ foldMaybeFree
   -> f (Maybe b)
 
 foldMaybeFree _ (F.Pure v) = pure (Just v)
-foldMaybeFree f (F.Free p) = f p >>= \x ->
-  case x of
+foldMaybeFree f (F.Free p) = f p >>= \case
     Nothing ->  pure Nothing
     Just v -> foldMaybeFree f v

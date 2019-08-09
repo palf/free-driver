@@ -11,21 +11,21 @@ module Drive.Intercom.Handlers
   , listAllConversations
   ) where
 
-import Drive.Intercom.Types
+import           Drive.Intercom.Types
 
-import qualified Data.Bifunctor     as Bi
-import qualified Data.Text          as T
-import qualified Data.Text.Encoding as T
-import qualified Drive              as D
-import qualified Drive.Describe     as D
-import qualified Drive.HTTP         as H
-import qualified Network.Wreq       as W
+import qualified Data.Bifunctor       as Bi
+import qualified Data.Text            as T
+import qualified Data.Text.Encoding   as T
+import qualified Drive                as D
+import qualified Drive.Describe       as D
+import qualified Drive.HTTP           as H
+import qualified Network.Wreq         as W
 
-import Control.Lens
-import Control.Monad
-import Data.Aeson
-import Data.Monoid ((<>))
-import Data.Functor (($>))
+import           Control.Lens
+import           Control.Monad
+import           Data.Aeson
+import           Data.Functor         (($>))
+import           Data.Monoid          ((<>))
 
 
 type DescribeP     = D.Free D.DescribeF

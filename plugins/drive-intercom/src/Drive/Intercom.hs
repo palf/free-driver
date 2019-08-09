@@ -2,9 +2,9 @@ module Drive.Intercom
   ( module X
   ) where
 
-import Drive.Intercom.Types    as X
-import Drive.Intercom.API      as X
-import Drive.Intercom.Handlers as X
+import           Drive.Intercom.API      as X
+import           Drive.Intercom.Handlers as X
+import           Drive.Intercom.Types    as X
 
 
 -- getConversationsResponse

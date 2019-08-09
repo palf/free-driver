@@ -17,7 +17,7 @@ import qualified Control.Monad.IO.Class as IOC
 import qualified Control.Monad.Reader   as R
 import qualified Data.Text              as T
 
-import Data.Semigroup ((<>))
+import           Data.Semigroup         ((<>))
 
 
 data FileF a

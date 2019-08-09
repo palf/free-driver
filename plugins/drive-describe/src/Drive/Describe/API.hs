@@ -6,9 +6,9 @@ module Drive.Describe.API
 
 import           Drive.Describe.Types
 
-import qualified Data.Text              as T
+import qualified Data.Text            as T
 
-import           Drive          (Free, liftF)
+import           Drive                (Free, liftF)
 
 
 mkDescribe :: PriorityLevel -> T.Text -> Free DescribeF ()

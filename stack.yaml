@@ -1,15 +1,15 @@
-flags: {}
-extra-package-dbs: []
-packages:
-- plugins/drive-base
-- plugins/drive-describe
-- plugins/drive-file
-- plugins/drive-http
-- plugins/drive-browser
-- plugins/drive-intercom
-- plugins/drive-trello
-- plugins/drive-slack
-- app
-extra-deps:
-- slack-api-0.12
 resolver: lts-8.13
+
+packages:
+  - plugins/drive-base
+  - plugins/drive-describe
+  - plugins/drive-file
+  - plugins/drive-http
+  - plugins/drive-browser
+  - plugins/drive-intercom
+  - plugins/drive-trello
+  - plugins/drive-slack
+  - app
+
+extra-deps:
+  - slack-api-0.12

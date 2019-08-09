@@ -1,11 +1,11 @@
-{-# LANGUAGE TypeOperators              #-}
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE ConstraintKinds            #-}
-{-# LANGUAGE MultiParamTypeClasses      #-}
-{-# LANGUAGE FlexibleInstances          #-}
 {-# LANGUAGE DeriveFunctor              #-}
+{-# LANGUAGE FlexibleInstances          #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE MultiParamTypeClasses      #-}
 {-# LANGUAGE OverloadedStrings          #-}
 {-# LANGUAGE StandaloneDeriving         #-}
+{-# LANGUAGE TypeOperators              #-}
 
 module Drive.Browser.Types
   ( BrowserF (..)
@@ -16,19 +16,19 @@ module Drive.Browser.Types
   ) where
 
 import qualified Control.Monad.IO.Class as IOC
+import           Data.Aeson
 import qualified Data.Text              as T
 import qualified Test.WebDriver.Class   as W.Cl
-import Data.Aeson
 
+import           Data.Functor           (($>))
+import qualified Drive                  as D
 import qualified Drive.Browser.Commands as C
-import Drive.Browser.Ref
-import Drive.Describe
-import qualified Drive as D
-import Data.Functor (($>))
+import           Drive.Browser.Ref
+import           Drive.Describe
 -- import Drive ((type (-<)))
-import Drive
+import           Drive
 
-import Data.Monoid ((<>))
+import           Data.Monoid            ((<>))
 
 
 newtype Url
@@ -53,11 +53,11 @@ data BrowserF a
 
 instance (Show a) => Show (BrowserF a) where
   show (GoToUrl u a) = "GoToUrl (" ++ show u ++ ") " ++ show a
-  show _ = undefined
+  show _             = undefined
 
 instance (Eq a) => Eq (BrowserF a) where
   (==) (GoToUrl u1 a1) (GoToUrl u2 a2) = (u1 == u2) && (a1 == a2)
-  (==) _ _ = undefined
+  (==) _ _                             = undefined
 
 instance (ToJSON a) => ToJSON (BrowserF a) where
   toJSON = undefined

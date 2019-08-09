@@ -5,15 +5,17 @@
 module Drive.Trello.Types
   ( TrelloF (..)
   , TrelloAuth (..)
-
   , User (..)
   , Organization (..)
   , Board (..)
   ) where
 
-import qualified Data.Text as T
-import GHC.Generics
-import Data.Aeson
+import qualified Data.Aeson   as A
+import qualified Data.Text    as T
+
+import           Data.Aeson   ((.:))
+import           Data.Text    (Text)
+import           GHC.Generics
 
 
 newtype User = User T.Text
@@ -23,11 +25,9 @@ newtype Board = Board
   { boardName :: T.Text
   } deriving (Show, Eq)
 
-instance FromJSON Board where
-  parseJSON = withObject "board" $ \v -> do
-    n <- v .: "name"
-
-    pure $ Board n
+instance A.FromJSON Board where
+  parseJSON = A.withObject "board" $
+    \v -> Board <$> v .: "name"
 
 
 data TrelloF a
@@ -36,8 +36,9 @@ data TrelloF a
 
 
 data TrelloAuth = TrelloAuth
-  { token :: T.Text
-  , key :: T.Text
+  { user  :: Text
+  , token :: Text
+  , key   :: Text
   } deriving (Show, Eq, Generic)
 
-instance FromJSON TrelloAuth
+instance A.FromJSON TrelloAuth

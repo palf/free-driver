@@ -4,6 +4,6 @@ module Drive.Slack
   , module Handlers
   ) where
 
-import Drive.Slack.Types    as Types
-import Drive.Slack.API      as API
-import Drive.Slack.Handlers as Handlers
+import           Drive.Slack.API      as API
+import           Drive.Slack.Handlers as Handlers
+import           Drive.Slack.Types    as Types

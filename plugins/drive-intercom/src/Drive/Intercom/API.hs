@@ -1,12 +1,12 @@
-{-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE TemplateHaskell  #-}
 
 module Drive.Intercom.API
    where
 
-import Control.Monad.Free.TH
-import Control.Monad.Free
-import Drive.Intercom.Types
+import           Control.Monad.Free
+import           Control.Monad.Free.TH
+import           Drive.Intercom.Types
 
 
 makeFree ''IntercomF

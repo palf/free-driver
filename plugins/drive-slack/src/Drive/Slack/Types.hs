@@ -1,5 +1,5 @@
 {-# LANGUAGE DeriveFunctor #-}
-{-# LANGUAGE DeriveGeneric     #-}
+{-# LANGUAGE DeriveGeneric #-}
 
 module Drive.Slack.Types
   ( SlackF (..)
@@ -7,9 +7,9 @@ module Drive.Slack.Types
   , Target (..)
   ) where
 
-import qualified Data.Text         as Tx
-import qualified Data.Yaml         as Y
-import qualified GHC.Generics      as G
+import qualified Data.Text    as Tx
+import qualified Data.Yaml    as Y
+import qualified GHC.Generics as G
 -- import qualified Web.Slack         as S
 -- import qualified Web.Slack.Message as S.M
 

@@ -7,8 +7,8 @@ module Drive.HTTP.Types
   , HttpError (..)
   ) where
 
-import qualified Network.Wreq           as W
-import qualified Data.ByteString.Lazy   as D
+import qualified Data.ByteString.Lazy as D
+import qualified Network.Wreq         as W
 
 
 type Uri = String

@@ -8,13 +8,13 @@ module Drive.Describe.Handlers
   ) where
 
 
-import Drive.Describe.Types
+import           Drive.Describe.Types
 
 import qualified Control.Monad.IO.Class as IOC
 import qualified Data.Text              as T
 
-import Data.Functor (($>))
-import           Data.Semigroup ((<>))
+import           Data.Functor           (($>))
+import           Data.Semigroup         ((<>))
 
 
 type SupportsLog m = (IOC.MonadIO m)

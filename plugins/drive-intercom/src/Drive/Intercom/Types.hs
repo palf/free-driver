@@ -13,14 +13,14 @@ module Drive.Intercom.Types
   , module C
   ) where
 
-import qualified Data.Text as T
-import GHC.Generics
-import Data.Aeson
+import           Data.Aeson
+import qualified Data.Text                         as T
+import           GHC.Generics
 
-import Drive.Intercom.Types.Pagination   as P
-import Drive.Intercom.Types.Admins       as A
-import Drive.Intercom.Types.Users        as U
-import Drive.Intercom.Types.Conversation as C
+import           Drive.Intercom.Types.Admins       as A
+import           Drive.Intercom.Types.Conversation as C
+import           Drive.Intercom.Types.Pagination   as P
+import           Drive.Intercom.Types.Users        as U
 
 
 data IntercomF a

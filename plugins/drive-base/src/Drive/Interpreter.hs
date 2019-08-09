@@ -1,5 +1,6 @@
-{-# LANGUAGE DeriveFunctor         #-}
 {-# LANGUAGE ConstraintKinds       #-}
+{-# LANGUAGE DeriveFunctor         #-}
+{-# LANGUAGE ExplicitNamespaces    #-}
 {-# LANGUAGE FlexibleContexts      #-}
 {-# LANGUAGE FlexibleInstances     #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
@@ -20,8 +21,8 @@ module Drive.Interpreter
   , bimapI
   ) where
 
+import           Control.Monad.Free (Free)
 import qualified Control.Monad.Free as F
-import Control.Monad.Free (Free)
 
 
 data (f :+: g) a

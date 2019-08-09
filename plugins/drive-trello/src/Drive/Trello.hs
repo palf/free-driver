@@ -4,6 +4,6 @@ module Drive.Trello
   , module Handlers
   ) where
 
-import Drive.Trello.Types    as Types
-import Drive.Trello.API      as API
-import Drive.Trello.Handlers as Handlers
+import           Drive.Trello.API      as API
+import           Drive.Trello.Handlers as Handlers
+import           Drive.Trello.Types    as Types
