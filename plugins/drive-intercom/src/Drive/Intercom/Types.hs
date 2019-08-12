@@ -1,6 +1,5 @@
 {-# LANGUAGE DeriveFunctor     #-}
 {-# LANGUAGE DeriveGeneric     #-}
-{-# LANGUAGE OverloadedStrings #-}
 
 module Drive.Intercom.Types
   ( IntercomF (..)

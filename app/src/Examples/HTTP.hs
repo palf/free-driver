@@ -5,32 +5,21 @@ module Main
   ) where
 
 import qualified Drive                as D
-import qualified GHC.Generics         as G
 import qualified Drive.HTTP           as H
 import qualified Data.Yaml            as Y
 import qualified Data.ByteString.Lazy as D
 
+import GHC.Generics (Generic)
 import Data.Monoid ((<>))
-
--- import Drive.NetworkSession
--- import Drive.Intercom.Conversation
 
 
 data Version = Version
   { major :: Int
   , minor :: Int
   , patch :: Int
-  } deriving (Eq, Show, G.Generic)
+  } deriving (Eq, Show, Generic)
 
 instance Y.FromJSON Version
-
-
-ff :: Monad m => (forall x. f x -> m x) -> D.Free f a -> m a
-ff = D.foldFree
-
-
-header :: String -> IO ()
-header t = putStrLn ("\n\n# " <> t)
 
 
 exampleHttpRequest :: D.Free H.HttpF D.ByteString
@@ -45,13 +34,11 @@ exampleAPIRequest
 
 main :: IO ()
 main = do
-  header "HTTP"
-  ff H.execHttp exampleHttpRequest >>= print
-  ff H.execHttp exampleAPIRequest >>= \x ->
-    case x of
-      Nothing -> print ("no response" :: String)
-      Just v  -> print (
+  D.foldFree H.execHttp exampleHttpRequest >>= print
+  D.foldFree H.execHttp exampleAPIRequest >>= maybe
+      (print ("no response" :: String))
+      (\v -> print (
         "major: " <> show (major v) <>
         "minor: " <> show (minor v) <>
         "patch: " <> show (patch v)
-                       )
+      ))

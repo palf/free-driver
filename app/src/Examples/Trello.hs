@@ -28,7 +28,7 @@ type TError      = T.TrelloError
 exampleGetTrelloBoardNames :: TrelloP [Text]
 exampleGetTrelloBoardNames = do
   let user = T.User "jackpalfrey3"
-  (fmap T.boardName ) <$> T.getBoards user
+  fmap T.boardName <$> T.getBoards user
 
 
 asDebug :: TrelloP a -> DescribeP a

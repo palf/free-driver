@@ -17,7 +17,6 @@ import           Drive.Interpreter  as X
 newtype EitherT e m a = EitherT {runEitherT :: m (Either e a)}
 
 instance Functor m => Functor (EitherT e m) where
-  -- fmap f (EitherT m) = EitherT $ (fmap f) <$> m
   fmap f (EitherT m) = EitherT $  (fmap . fmap) f m
 
 instance Monad m => Applicative (EitherT e m) where
@@ -25,8 +24,7 @@ instance Monad m => Applicative (EitherT e m) where
   EitherT f <*> EitherT v =
     EitherT $ f >>= either
       (pure . Left)
-      -- (\k -> (fmap . fmap) k v)
-      (\k -> (fmap k) <$> v)
+      (\k -> fmap k <$> v)
 
 
 instance Monad m => Monad (EitherT e m) where

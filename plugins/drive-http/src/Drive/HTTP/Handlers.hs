@@ -106,7 +106,7 @@ runGet opts u
       ( do
         res <- W.getWith opts u
 
-        case res ^. responseStatus ^. statusCode of
+        case res ^. (responseStatus . statusCode) of
           200 -> do
             let x = res ^. responseBody
             pure $ Right x

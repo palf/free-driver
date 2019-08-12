@@ -20,13 +20,6 @@ import qualified Drive.Describe    as D
 import qualified Web.Slack         as S
 
 
--- type SupportsSlack m = (IOC.MonadIO m)
-
-
--- execSlack :: (SupportsSlack m) => SlackF a -> m a
--- execSlack (SlackEntry l t a) = IOC.liftIO $ printMessage l t >> pure a
-
-
 data SlackCredentialsError
   = NotFound
   deriving (Show)
@@ -48,23 +41,17 @@ withSlackCredentials
 
 withSlackCredentials path f
   = getSlackConfig path
-  >>= \x ->
-      case x of
-        Left e  -> pure (Left e)
-        Right r -> Right <$> f r
-    -- case c of
-    --   Nothing -> pure ()
-    --   Just x -> f x
+  >>= either
+    (pure . Left)
+    (fmap Right . f)
 
 
 getSlackConfig :: FilePath -> IO (Either SlackCredentialsError S.SlackConfig)
-getSlackConfig path = do
-  r <- getCreds
-  case r of
-    Just (x:_) -> pure (Right $ mkC x)
-    _          -> pure (Left NotFound)
+getSlackConfig path = f <$> Y.decodeFile path
 
-   where
-     getCreds = Y.decodeFile path :: IO (Maybe [SlackCredentials])
-     mkC r = S.SlackConfig { S._slackApiToken = Tx.unpack (token r) }
+  where
+    f :: Maybe [SlackCredentials] -> Either SlackCredentialsError S.SlackConfig
+    f (Just (x:_)) = Right (mkC x)
+    f _            = Left NotFound
 
+    mkC r = S.SlackConfig { S._slackApiToken = Tx.unpack (token r) }

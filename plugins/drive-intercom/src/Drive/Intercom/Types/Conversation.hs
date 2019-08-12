@@ -1,4 +1,5 @@
 {-# LANGUAGE DeriveGeneric              #-}
+{-# LANGUAGE ScopedTypeVariables              #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE LambdaCase                 #-}
 {-# LANGUAGE OverloadedStrings          #-}
@@ -47,7 +48,7 @@ instance FromJSON Author where
   parseJSON = withObject "author" $
     \v -> v .: "type"
     >>= \case
-      "admin" -> v .: "id" >>= KnownAdmin
+      ("admin" :: String) -> KnownAdmin <$> (v .: "id")
       _ -> pure Anon
 
 

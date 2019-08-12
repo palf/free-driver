@@ -48,7 +48,7 @@ assertDescribeDoesNotRunComputation = do
     where
 
       describeP :: DescribeM Int
-      describeP = pure 0 <$> entry "zero"
+      describeP = 0 <$ entry "zero"
 
       joinedAlg :: Free (SimpleF Int :+: ComplexF Int) Int
       joinedAlg = do

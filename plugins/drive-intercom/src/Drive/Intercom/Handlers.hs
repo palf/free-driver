@@ -95,16 +95,17 @@ listAllConversations
 
   where
     runit :: T.Text -> HttpIntercomP (Either IntercomError [Conversation])
-    runit u = do
-      fs <- mkIntercomRequest u
-      case fs of
-        Left e  -> pure $ Left e
-        Right v -> do
+    runit u =
+      mkIntercomRequest u >>=
+      either
+        (pure . Left)
+        (\v -> do
           let rs = conversations v
           maybe
             (pure $ Right rs)
-            (\l -> mapRight (mappend rs) <$> runit l)
+            (fmap (mapRight (mappend rs)) . runit)
             (getNextPageLink v)
+        )
 
     getNextPageLink :: ConversationsResponse -> Maybe T.Text
     getNextPageLink = pages >=> next

@@ -35,13 +35,13 @@ type DescribeM a  = Free DescribeF a
 
 runSimpleF :: (Monad m, Num t) => t -> SimpleF t a -> m a
 runSimpleF x (Double f) = f <$> pure (x + x)
-runSimpleF x (Triple f) = pure (x + x + x) >>= pure . f
+runSimpleF x (Triple f) = f <$> pure (x + x + x)
 
 runSimpleM :: (Monad m, Num t) => t -> SimpleM t a -> m a
 runSimpleM n = foldFree (runSimpleF n)
 
 runComplexF :: (Monad m, Num t) => t -> ComplexF t a -> m a
-runComplexF x (Multiply n f) = pure (n * x) >>= pure . f
+runComplexF x (Multiply n f) = f <$> pure (n * x)
 
 runComplexM :: (Monad m, Num t) => t -> ComplexM t a -> m a
 runComplexM x = foldFree (runComplexF x)

@@ -59,4 +59,4 @@ cardsToBrowserI (Select t a) = do
   pure a
 
 cardsToBrowserI (ReadHeader a)
-  = D.readText (D.CSS "h3") >>= pure . a
+  = a <$> D.readText (D.CSS "h3")

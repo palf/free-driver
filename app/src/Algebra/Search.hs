@@ -39,7 +39,7 @@ searchToBrowserI (SearchFor t a) = do
   pure a
 
 searchToBrowserI (FindFirstMatch a)
-  = D.readText (D.CSS "h3.r") >>= pure . a
+  = a <$> D.readText (D.CSS "h3.r")
 
 
 instance D.Interpretable SearchF D.BrowserF where
