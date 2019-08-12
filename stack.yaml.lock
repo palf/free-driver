@@ -13,7 +13,7 @@ packages:
     hackage: slack-api-0.12
 snapshots:
 - completed:
-    size: 514891
-    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/8/13.yaml
-    sha256: 3f5895e269aba0d6df16bab41870937b7565532dd8ab5aef3e56ba621d8b70f9
-  original: lts-8.13
+    size: 496698
+    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/13/10.yaml
+    sha256: cccd8a6de18d13cd00f751b25684b3ca1e548648ea41874de78904fec1b9cb36
+  original: lts-13.10
