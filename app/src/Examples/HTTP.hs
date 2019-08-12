@@ -4,13 +4,13 @@ module Main
   ( main
   ) where
 
+import qualified Data.ByteString.Lazy as D
+import qualified Data.Yaml            as Y
 import qualified Drive                as D
 import qualified Drive.HTTP           as H
-import qualified Data.Yaml            as Y
-import qualified Data.ByteString.Lazy as D
 
-import GHC.Generics (Generic)
-import Data.Monoid ((<>))
+import           Data.Monoid          ((<>))
+import           GHC.Generics         (Generic)
 
 
 data Version = Version

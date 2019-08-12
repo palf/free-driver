@@ -1,14 +1,17 @@
+{-# LANGUAGE ExplicitForAll   #-}
+{-# LANGUAGE FlexibleContexts #-}
+
 module Examples.Intercom.Interpreters
    where
 
 import qualified Control.Monad.Reader as R
 import qualified Drive                as D
+import qualified Drive.Describe       as D
 import qualified Drive.HTTP           as H
-import qualified Drive.Describe            as D
-import qualified Drive.Intercom         as I
+import qualified Drive.Intercom       as I
 
-import Control.Monad      (void)
-import Control.Monad.Free (Free(..))
+import           Control.Monad        (void)
+import           Control.Monad.Free   (Free (..))
 
 
 type DescribeP     = D.Free D.DescribeF

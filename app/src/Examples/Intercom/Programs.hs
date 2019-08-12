@@ -9,9 +9,9 @@ module Examples.Intercom.Programs
   , firstConversation
   ) where
 
-import qualified Data.Text            as T
-import qualified Drive                as D
-import qualified Drive.Intercom       as I
+import qualified Data.Text      as T
+import qualified Drive          as D
+import qualified Drive.Intercom as I
 
 
 type IntercomP a = D.Free I.IntercomF a
@@ -46,5 +46,5 @@ firstConversation :: IntercomP (Either T.Text I.Conversation)
 firstConversation = do
   cs <- I.listConversations
   case cs of
-    [] -> pure $ Left "did not get any conversations"
+    []  -> pure $ Left "did not get any conversations"
     x:_ -> Right <$> I.getConversation x

@@ -1,8 +1,8 @@
 {-# LANGUAGE DeriveGeneric              #-}
-{-# LANGUAGE ScopedTypeVariables              #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE LambdaCase                 #-}
 {-# LANGUAGE OverloadedStrings          #-}
+{-# LANGUAGE ScopedTypeVariables        #-}
 
 module Drive.Intercom.Types.Conversation
   ( ConversationsResponse (..)

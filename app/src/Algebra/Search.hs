@@ -1,3 +1,4 @@
+{-# LANGUAGE MultiParamTypeClasses #-}
 module Algebra.Search
   ( SearchF
   , searchFor
@@ -6,22 +7,23 @@ module Algebra.Search
 
 import qualified Control.Monad.Free as F
 import qualified Data.Text          as T
-import qualified Drive         as D
+import qualified Drive              as D
 
-import Data.Monoid ((<>))
+import           Data.Monoid        ((<>))
+import           Data.Text          (Text)
 
 
 data SearchF a
-  = SearchFor T.Text a
-  | FindFirstMatch (T.Text -> a)
+  = SearchFor Text a
+  | FindFirstMatch (Text -> a)
   deriving (Functor)
 
 
-searchFor :: T.Text -> F.Free SearchF ()
+searchFor :: Text -> F.Free SearchF ()
 searchFor t = F.liftF $ SearchFor t ()
 
 
-findFirstMatch :: F.Free SearchF T.Text
+findFirstMatch :: F.Free SearchF Text
 findFirstMatch = F.liftF $ FindFirstMatch id
 
 

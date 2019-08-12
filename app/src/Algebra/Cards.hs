@@ -1,3 +1,5 @@
+{-# LANGUAGE MultiParamTypeClasses #-}
+
 module Drive.Cards
   ( CardsF
   , Game (..)
@@ -6,10 +8,10 @@ module Drive.Cards
   , readHeader
   ) where
 
-import qualified Data.Text          as T
-import qualified Drive         as D
+import qualified Data.Text   as T
+import qualified Drive       as D
 
-import Data.Monoid ((<>))
+import           Data.Monoid ((<>))
 
 
 data CardsF a

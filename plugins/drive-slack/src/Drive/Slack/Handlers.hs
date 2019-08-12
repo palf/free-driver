@@ -47,11 +47,11 @@ withSlackCredentials path f
 
 
 getSlackConfig :: FilePath -> IO (Either SlackCredentialsError S.SlackConfig)
-getSlackConfig path = f <$> Y.decodeFile path
+getSlackConfig path = f <$> Y.decodeFileEither path
 
   where
-    f :: Maybe [SlackCredentials] -> Either SlackCredentialsError S.SlackConfig
-    f (Just (x:_)) = Right (mkC x)
-    f _            = Left NotFound
+    f :: Either Y.ParseException [SlackCredentials] -> Either SlackCredentialsError S.SlackConfig
+    f (Right (x:_)) = Right (mkC x)
+    f _             = Left NotFound
 
     mkC r = S.SlackConfig { S._slackApiToken = Tx.unpack (token r) }

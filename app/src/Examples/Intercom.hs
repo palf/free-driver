@@ -2,10 +2,10 @@ module Main
   ( main
   ) where
 
-import qualified Data.Yaml            as Y
-import Control.Monad.Reader
-import Examples.Intercom.Programs
-import Examples.Intercom.Interpreters
+import           Control.Monad.Reader
+import qualified Data.Yaml                      as Y
+import           Examples.Intercom.Interpreters
+import           Examples.Intercom.Programs
 
 
 data AppError
@@ -29,11 +29,11 @@ runIntercomProgram
        )
 
 runIntercomProgram p = do
-  a <- Y.decodeFile "./credentials/intercom.yaml"
+  a <- Y.decodeFileEither "./credentials/intercom.yaml"
 
   case a of
-    Nothing -> pure (Left NoCredsError)
-    Just c  -> do
+    Left _ -> pure (Left NoCredsError)
+    Right c  -> do
       r <- runReaderT (runProg p) c
       pure (Right r)
 

@@ -1,12 +1,14 @@
+{-# LANGUAGE ExplicitForAll #-}
+
 module Main
   ( main
   ) where
 
-import qualified Drive        as D
-import qualified Drive.File    as F
-import qualified Drive.Describe     as D
+import qualified Drive          as D
+import qualified Drive.Describe as D
+import qualified Drive.File     as F
 
-import Data.Monoid ((<>))
+import           Data.Monoid    ((<>))
 
 -- import Drive.NetworkSession
 -- import Drive.Intercom.Conversation

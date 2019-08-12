@@ -1,12 +1,16 @@
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE TemplateHaskell       #-}
+{-# LANGUAGE TypeOperators         #-}
+
 module Test.Drive.Algebras
   where
 
-import Drive
-import Control.Monad.Free
-import Control.Monad.Free.TH
-import Control.Monad.IO.Class
-import Data.Text
-import Data.Monoid
+import           Control.Monad.Free
+import           Control.Monad.Free.TH
+import           Control.Monad.IO.Class
+import           Data.Monoid
+import           Data.Text
+import           Drive
 
 
 data SimpleF t a
@@ -32,6 +36,7 @@ makeFree ''DescribeF
 type SimpleM t a  = Free (SimpleF t) a
 type ComplexM t a = Free (ComplexF t) a
 type DescribeM a  = Free DescribeF a
+
 
 runSimpleF :: (Monad m, Num t) => t -> SimpleF t a -> m a
 runSimpleF x (Double f) = f <$> pure (x + x)

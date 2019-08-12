@@ -1,17 +1,16 @@
+{-# LANGUAGE ExplicitForAll        #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+
 module Main
   ( main
   ) where
 
-import qualified Data.Text     as Tx
-import qualified Drive         as D
-import qualified Drive.Browser as B
-import qualified Drive.Describe     as D
+import qualified Data.Text      as Tx
+import qualified Drive          as D
+import qualified Drive.Browser  as B
+import qualified Drive.Describe as D
 
-import Data.Monoid ((<>))
-
-
--- import Drive.NetworkSession
--- import Drive.Intercom.Conversation
+import           Data.Monoid    ((<>))
 
 
 ff :: Monad m => (forall x. f x -> m x) -> D.Free f a -> m a
@@ -30,13 +29,6 @@ readPageTitle :: D.Free B.BrowserF Tx.Text
 readPageTitle = do
   B.goToUrl (B.Url "https://www.google.com/")
   B.readTitle
-
-
--- causeNoSuchElementError :: D.Free B.BrowserF Text
--- causeNoSuchElementError = do
---   goToUrl (Url "http://localhost:3000")
---   x <- readText (CSS "li:nth-child(4)")
---   pure x
 
 
 main :: IO ()

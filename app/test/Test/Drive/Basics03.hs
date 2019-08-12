@@ -1,11 +1,15 @@
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE TypeOperators    #-}
+
+
 module Test.Drive.Basics03
   ( tests
   ) where
 
-import Test.Tasty
-import Test.Tasty.HUnit
-import Test.Drive.Algebras
-import Drive
+import           Drive
+import           Test.Drive.Algebras
+import           Test.Tasty
+import           Test.Tasty.HUnit
 
 tests :: TestTree
 tests = testGroup "basics 03"
@@ -30,8 +34,6 @@ runDescribe :: DescribeM a -> IO a
 runDescribe = runDescribeM
 
 -- asComplex :: (Convertable f ( ComplexF t )) => Free f a -> ComplexM t a
--- asComplex = foldFree convert
-
 asComplex :: SimpleM Int a -> ComplexM Int a
 asComplex = foldFree convert
 

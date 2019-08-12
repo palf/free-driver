@@ -1,21 +1,21 @@
-{-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE TypeOperators    #-}
 
 module Main
   ( main
   ) where
 
-import qualified Control.Monad.Reader as R
-import qualified Data.Yaml            as Y
-import qualified Drive                as D
-import qualified Drive.HTTP           as H
-import qualified Drive.Describe            as D
-import qualified Drive.Trello         as T
+import qualified Control.Monad.Reader   as R
+import qualified Data.Yaml              as Y
+import qualified Drive                  as D
+import qualified Drive.Describe         as D
+import qualified Drive.HTTP             as H
+import qualified Drive.Trello           as T
 
-import Control.Monad.IO.Class (MonadIO)
-import Control.Monad      (void)
-import Control.Monad.Free (Free(..))
-import Data.Text          (Text)
+import           Control.Monad          (void)
+import           Control.Monad.Free     (Free (..))
+import           Control.Monad.IO.Class (MonadIO)
+import           Data.Text              (Text)
 
 
 type DescribeP   = Free D.DescribeF

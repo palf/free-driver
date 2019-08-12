@@ -2,9 +2,9 @@ module Main
   ( main
   ) where
 
-import qualified Test.Tasty as Tasty
+import qualified Test.Tasty          as Tasty
 
-import qualified Test.Drive.Basics as Basics01
+import qualified Test.Drive.Basics   as Basics01
 import qualified Test.Drive.Basics03 as Basics03
 
 main :: IO ()
