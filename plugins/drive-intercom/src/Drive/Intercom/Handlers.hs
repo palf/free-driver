@@ -11,21 +11,20 @@ module Drive.Intercom.Handlers
   , listAllConversations
   ) where
 
-import           Drive.Intercom.Types
-
-import qualified Data.Bifunctor       as Bi
-import qualified Data.Text            as T
-import qualified Data.Text.Encoding   as T
-import qualified Drive                as D
-import qualified Drive.Describe       as D
-import qualified Drive.HTTP           as H
-import qualified Network.Wreq         as W
-
 import           Control.Lens
 import           Control.Monad
 import           Data.Aeson
+import qualified Data.Bifunctor       as Bi
 import           Data.Functor         (($>))
 import           Data.Monoid          ((<>))
+import           Data.Text            (Text)
+import qualified Data.Text            as Text
+import           Data.Text.Encoding   (encodeUtf8)
+import qualified Drive                as D
+import qualified Drive.Describe       as D
+import qualified Drive.HTTP           as H
+import           Drive.Intercom.Types
+import qualified Network.Wreq         as W
 
 
 type DescribeP     = D.Free D.DescribeF
@@ -56,7 +55,7 @@ mkOpts :: IntercomCredentials -> W.Options
 mkOpts y
   = W.defaults
     & W.header "Accept" .~ ["application/json"]
-    & W.header "Authorization" .~ [T.encodeUtf8 (authorization y)]
+    & W.header "Authorization" .~ [encodeUtf8 (authorization y)]
 
 
 newtype IntercomError
@@ -94,7 +93,7 @@ listAllConversations
   = (fmap . fmap . fmap) convID (runit "https://api.intercom.io/conversations")
 
   where
-    runit :: T.Text -> HttpIntercomP (Either IntercomError [Conversation])
+    runit :: Text -> HttpIntercomP (Either IntercomError [Conversation])
     runit u =
       mkIntercomRequest u >>=
       either
@@ -107,18 +106,18 @@ listAllConversations
             (getNextPageLink v)
         )
 
-    getNextPageLink :: ConversationsResponse -> Maybe T.Text
+    getNextPageLink :: ConversationsResponse -> Maybe Text
     getNextPageLink = pages >=> next
 
 
 mkIntercomRequest
   :: (FromJSON a)
-  => T.Text
+  => Text
   -> HttpIntercomP (Either IntercomError a)
 
 mkIntercomRequest u
   = mapLeft IntercomError . eitherDecode
-  <$> H.getRawOpts mkOpts (T.unpack u)
+  <$> H.getRawOpts mkOpts (Text.unpack u)
 
 
 mapLeft :: (a -> c) -> Either a b -> Either c b

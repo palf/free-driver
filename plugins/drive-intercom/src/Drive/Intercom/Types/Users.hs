@@ -6,14 +6,13 @@ module Drive.Intercom.Types.Users
   where
 
 import           Data.Aeson
-import qualified Data.Text                       as T
-import           GHC.Generics
-
+import           Data.Text                       (Text)
 import qualified Drive.Intercom.Types.Pagination as P
+import           GHC.Generics
 
 
 newtype UserID
-  = UserID T.Text
+  = UserID Text
   deriving (Show, Generic, FromJSON)
 
 
@@ -62,7 +61,7 @@ nullUser = User
 
 
 -- data ScrollResponse = ScrollResponse
---   { scrollParam :: T.Text
+--   { scrollParam :: Text
 --   , users       :: [User]
 --   } deriving (Show, Generic)
 

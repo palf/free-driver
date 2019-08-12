@@ -8,16 +8,15 @@ module Drive.Cards
   , readHeader
   ) where
 
-import qualified Data.Text   as T
-import qualified Drive       as D
-
 import           Data.Monoid ((<>))
+import qualified Data.Text   as Text
+import qualified Drive       as D
 
 
 data CardsF a
   = Open a
   | Select Game a
-  | ReadHeader (T.Text -> a)
+  | ReadHeader (Text -> a)
   deriving (Functor)
 
 
@@ -33,7 +32,7 @@ select :: Game -> D.Free CardsF ()
 select t = D.liftF $ Select t ()
 
 
-readHeader :: D.Free CardsF T.Text
+readHeader :: D.Free CardsF Text
 readHeader = D.liftF $ ReadHeader id
 
 
@@ -42,9 +41,9 @@ instance D.Interpretable CardsF D.LogF where
 
 
 cardsToLogI :: D.Interpreter CardsF D.LogF a
-cardsToLogI (Open a)       = D.debug (T.pack "open") >> pure a
-cardsToLogI (Select t a)   = D.debug (T.pack $ "select " <> show t) >> pure a
-cardsToLogI (ReadHeader a) = D.debug (T.pack "readHeader") >> pure (a "header")
+cardsToLogI (Open a)       = D.debug (Text.pack "open") >> pure a
+cardsToLogI (Select t a)   = D.debug (Text.pack $ "select " <> show t) >> pure a
+cardsToLogI (ReadHeader a) = D.debug (Text.pack "readHeader") >> pure (a "header")
 
 
 instance D.Interpretable CardsF D.BrowserF where
@@ -57,7 +56,7 @@ cardsToBrowserI (Open a) = do
   pure a
 
 cardsToBrowserI (Select t a) = do
-  D.clickOn (D.LinkText $ T.pack (show t) )
+  D.clickOn (D.LinkText $ Text.pack (show t) )
   pure a
 
 cardsToBrowserI (ReadHeader a)

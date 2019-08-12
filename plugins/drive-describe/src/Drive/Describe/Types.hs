@@ -5,7 +5,7 @@ module Drive.Describe.Types
   , PriorityLevel (..)
   ) where
 
-import qualified Data.Text as T
+import           Data.Text (Text)
 
 
 data PriorityLevel
@@ -14,5 +14,5 @@ data PriorityLevel
   | Warn
 
 
-data DescribeF a = LogEntry PriorityLevel T.Text a
+data DescribeF a = LogEntry PriorityLevel Text a
   deriving (Functor)

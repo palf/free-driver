@@ -13,15 +13,14 @@ module Drive.Intercom.Types.Conversation
   ) where
 
 import           Data.Aeson.Types
-import qualified Data.Text                       as T
+import           Data.Text                       (Text)
 import qualified Data.Vector                     as V
-import           GHC.Generics                    (Generic)
-
 import           Drive.Intercom.Types.Pagination
+import           GHC.Generics                    (Generic)
 
 
 newtype ConversationID
-  = ConversationID T.Text
+  = ConversationID Text
   deriving (Show, Generic, FromJSON)
 
 

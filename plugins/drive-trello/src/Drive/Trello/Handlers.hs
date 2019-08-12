@@ -10,17 +10,17 @@ module Drive.Trello.Handlers
   , opts
   ) where
 
-import qualified Data.Text          as T
-import qualified Drive              as D
-import qualified Drive.Describe     as D
-import qualified Drive.HTTP         as H
-import qualified Network.Wreq       as W
-
 import           Control.Lens
 import           Data.Aeson
 import           Data.Functor       (($>))
 import           Data.Monoid        ((<>))
+import           Data.Text          (Text)
+import qualified Data.Text          as Text
+import qualified Drive              as D
+import qualified Drive.Describe     as D
+import qualified Drive.HTTP         as H
 import           Drive.Trello.Types
+import qualified Network.Wreq       as W
 
 
 type DescribeP   = D.Free D.DescribeF
@@ -38,7 +38,7 @@ trelloToDescribeI (GetBoards u f)
   = D.debug ("getting boards for user \"" <> showUser u <> "\"") $> f []
 
 
-showUser :: User -> T.Text
+showUser :: User -> Text
 showUser (User u) = u
 
 
@@ -65,7 +65,7 @@ trelloToNetworkI (GetBoards u f) = do
 
 getPath :: User -> TrelloAuth -> String
 getPath (User u) auth
-  = T.unpack $ "https://api.trello.com/1/members/"
+  = Text.unpack $ "https://api.trello.com/1/members/"
     <> u
     <> "/boards?"
     <> "token=" <> token auth
@@ -74,7 +74,7 @@ getPath (User u) auth
 
 -- getPath' :: Organization -> TrelloAuth -> String
 -- getPath' (Organization u) auth
---   = T.unpack $ "https://api.trello.com/1/organizations/"
+--   = Text.unpack $ "https://api.trello.com/1/organizations/"
 --     <> u
 --     <> "/boards?"
 --     <> "token=" <> token auth

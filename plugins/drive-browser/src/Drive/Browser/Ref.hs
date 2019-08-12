@@ -3,14 +3,14 @@ module Drive.Browser.Ref
   , showRef
   ) where
 
-import qualified Data.Text as T
+import           Data.Text (Text)
 
 
 data Ref
-  = CSS T.Text
-  | LinkText T.Text
+  = CSS Text
+  | LinkText Text
 
 
-showRef :: Ref -> T.Text
+showRef :: Ref -> Text
 showRef (CSS r)      = r
 showRef (LinkText r) = r

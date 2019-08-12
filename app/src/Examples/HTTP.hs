@@ -5,11 +5,10 @@ module Main
   ) where
 
 import qualified Data.ByteString.Lazy as D
+import           Data.Monoid          ((<>))
 import qualified Data.Yaml            as Y
 import qualified Drive                as D
 import qualified Drive.HTTP           as H
-
-import           Data.Monoid          ((<>))
 import           GHC.Generics         (Generic)
 
 

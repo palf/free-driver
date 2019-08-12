@@ -5,7 +5,7 @@ module Drive.Browser.Configuration
   , runInBrowser
   ) where
 
-import qualified Data.Text             as T
+import           Data.Text             (Text)
 import qualified Test.WebDriver        as W
 import qualified Test.WebDriver.Config as W.Conf
 
@@ -14,7 +14,7 @@ runDefaultSession :: W.WD a -> IO a
 runDefaultSession = runInBrowser "chrome"
 
 
-runInBrowser :: T.Text -> W.WD a -> IO a
+runInBrowser :: Text -> W.WD a -> IO a
 runInBrowser b = W.runSession conf . W.finallyClose
   where
     conf = W.Conf.useBrowser (W.Browser b) W.Conf.defaultConfig

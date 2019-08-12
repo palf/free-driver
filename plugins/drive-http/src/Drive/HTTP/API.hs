@@ -12,13 +12,11 @@ module Drive.HTTP.API
 
 import           Control.Monad.Free
 import           Control.Monad.Free.TH
-import           Drive.HTTP.Types
-
 import qualified Data.Aeson            as Aeson
 import qualified Data.ByteString.Lazy  as D
-import qualified Network.Wreq          as W
-
 import           Drive                 (Free, liftF)
+import           Drive.HTTP.Types
+import qualified Network.Wreq          as W
 
 
 makeFree ''HttpUriF

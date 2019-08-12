@@ -10,13 +10,12 @@ module Drive.Slack.Handlers
   ) where
 
 
-import           Drive.Slack.Types
-
-import           Data.Functor
-import qualified Data.Text         as Tx
+import           Data.Functor      (($>))
+import qualified Data.Text         as Text
 import qualified Data.Yaml         as Y
 import qualified Drive             as D
 import qualified Drive.Describe    as D
+import           Drive.Slack.Types
 import qualified Web.Slack         as S
 
 
@@ -54,4 +53,4 @@ getSlackConfig path = f <$> Y.decodeFileEither path
     f (Right (x:_)) = Right (mkC x)
     f _             = Left NotFound
 
-    mkC r = S.SlackConfig { S._slackApiToken = Tx.unpack (token r) }
+    mkC r = S.SlackConfig { S._slackApiToken = Text.unpack (token r) }

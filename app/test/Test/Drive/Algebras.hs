@@ -8,10 +8,10 @@ module Test.Drive.Algebras
 import           Control.Monad.Free
 import           Control.Monad.Free.TH
 import           Control.Monad.IO.Class
-import           Data.Monoid
-import           Data.Text
+import           Data.Functor           (($>))
+import           Data.Text              (Text)
+import qualified Data.Text              as Text
 import           Drive
-
 
 data SimpleF t a
   = Double (t -> a)
@@ -53,7 +53,7 @@ runComplexM x = foldFree (runComplexF x)
 
 runDescribeF :: (MonadIO m) => DescribeF a -> m a
 runDescribeF (Entry t a) = printText t $> a
-  where printText = liftIO . print . unpack
+  where printText = liftIO . print . Text.unpack
 
 runDescribeM :: (MonadIO m) => DescribeM a -> m a
 runDescribeM = foldFree runDescribeF
@@ -76,4 +76,4 @@ instance (Num t) => Convertable (SimpleF t) (ComplexF t) where
   convert (Triple f) = f <$> multiply 3
 
 instance (Num t, Show t) => Convertable (ComplexF t) DescribeF where
-  convert (Multiply n f) = f 0 <$ entry ("multiply: " <> pack (show n))
+  convert (Multiply n f) = f 0 <$ entry ("multiply: " <> Text.pack (show n))

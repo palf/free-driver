@@ -15,15 +15,13 @@ module Drive.Browser.Commands
 
 import qualified Control.Concurrent         as Cr
 import qualified Control.Monad.IO.Class     as IOC
-import qualified Data.Text                  as T
+import           Data.Text                  (Text)
+import           Drive.Browser.Ref
 import qualified Test.WebDriver.Class       as W.Cl
 import qualified Test.WebDriver.Commands    as W.Com
 import qualified Test.WebDriver.Common.Keys as W.Keys
 
-import           Drive.Browser.Ref
-
-
-readTitle :: (W.Cl.WebDriver m) => m T.Text
+readTitle :: (W.Cl.WebDriver m) => m Text
 readTitle = W.Com.getTitle
 
 
@@ -35,7 +33,7 @@ clear :: (W.Cl.WebDriver m) => Ref -> m ()
 clear r = withElement r W.Com.clearInput
 
 
-sendKeys :: (W.Cl.WebDriver m) => Ref -> T.Text -> m ()
+sendKeys :: (W.Cl.WebDriver m) => Ref -> Text -> m ()
 sendKeys r t = withElement r (W.Com.sendKeys t)
 
 
@@ -43,7 +41,7 @@ pressEnter :: (W.Cl.WebDriver m) => Ref -> m ()
 pressEnter r = withElement r (W.Com.sendKeys W.Keys.enter)
 
 
-getText :: (W.Cl.WebDriver m) => Ref -> m T.Text
+getText :: (W.Cl.WebDriver m) => Ref -> m Text
 getText r = withElement r W.Com.getText
 
 

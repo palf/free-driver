@@ -5,12 +5,11 @@ module Main
   ( main
   ) where
 
-import qualified Data.Text      as Tx
+import           Data.Monoid    ((<>))
+import           Data.Text      (Text)
 import qualified Drive          as D
 import qualified Drive.Browser  as B
 import qualified Drive.Describe as D
-
-import           Data.Monoid    ((<>))
 
 
 ff :: Monad m => (forall x. f x -> m x) -> D.Free f a -> m a
@@ -25,7 +24,7 @@ subheader :: String -> IO ()
 subheader t = putStrLn ("\n-- " <> t <> "\n")
 
 
-readPageTitle :: D.Free B.BrowserF Tx.Text
+readPageTitle :: D.Free B.BrowserF Text
 readPageTitle = do
   B.goToUrl (B.Url "https://www.google.com/")
   B.readTitle

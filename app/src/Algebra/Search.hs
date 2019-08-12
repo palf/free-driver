@@ -5,12 +5,11 @@ module Algebra.Search
   , findFirstMatch
   ) where
 
-import qualified Control.Monad.Free as F
-import qualified Data.Text          as T
-import qualified Drive              as D
-
+import qualified Control.Monad.Free as Free
 import           Data.Monoid        ((<>))
 import           Data.Text          (Text)
+import qualified Data.Text          as Text
+import qualified Drive              as D
 
 
 data SearchF a
@@ -19,12 +18,12 @@ data SearchF a
   deriving (Functor)
 
 
-searchFor :: Text -> F.Free SearchF ()
-searchFor t = F.liftF $ SearchFor t ()
+searchFor :: Text -> Free SearchF ()
+searchFor t = Free.liftF $ SearchFor t ()
 
 
-findFirstMatch :: F.Free SearchF Text
-findFirstMatch = F.liftF $ FindFirstMatch id
+findFirstMatch :: Free SearchF Text
+findFirstMatch = Free.liftF $ FindFirstMatch id
 
 
 searchToLogI :: D.Interpreter SearchF D.LogF a

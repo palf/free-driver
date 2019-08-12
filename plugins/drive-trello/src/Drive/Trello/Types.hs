@@ -10,19 +10,17 @@ module Drive.Trello.Types
   , Board (..)
   ) where
 
-import qualified Data.Aeson   as A
-import qualified Data.Text    as T
-
 import           Data.Aeson   ((.:))
+import qualified Data.Aeson   as A
 import           Data.Text    (Text)
 import           GHC.Generics
 
 
-newtype User = User T.Text
-newtype Organization = Organization T.Text
+newtype User = User Text
+newtype Organization = Organization Text
 
 newtype Board = Board
-  { boardName :: T.Text
+  { boardName :: Text
   } deriving (Show, Eq)
 
 instance A.FromJSON Board where

@@ -21,7 +21,7 @@ module Drive.Interpreter
   ) where
 
 import           Control.Monad.Free (Free)
-import qualified Control.Monad.Free as F
+import qualified Control.Monad.Free as Free
 
 
 data (f :+: g) a
@@ -37,15 +37,15 @@ type (f -< g) a = Interpreter f g a
 
 
 identityI :: (Functor f) => Interpreter f f a
-identityI = F.liftF
+identityI = Free.liftF
 
 
 liftL :: (Functor f, Functor g) => Free f a -> Free (f :+: g) a
-liftL = F.hoistFree D
+liftL = Free.hoistFree D
 
 
 liftR :: (Functor f, Functor g) => Free g a -> Free (f :+: g) a
-liftR = F.hoistFree R
+liftR = Free.hoistFree R
 
 
 sumI
@@ -65,7 +65,7 @@ composeI
   -> Interpreter f h b
 
 composeI a b
-  = F.foldFree a . b
+  = Free.foldFree a . b
 
 
 bimapI

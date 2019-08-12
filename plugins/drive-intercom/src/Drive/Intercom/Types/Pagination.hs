@@ -4,16 +4,15 @@ module Drive.Intercom.Types.Pagination
    where
 
 import           Data.Aeson
+import           Data.Text    (Text)
 import           GHC.Generics
-
-import qualified Data.Text    as T
 
 
 data Pagination = Pagination
-  { next  :: Maybe T.Text
-  , prev  :: Maybe T.Text
-  , first :: Maybe T.Text
-  , last  :: Maybe T.Text
+  { next  :: Maybe Text
+  , prev  :: Maybe Text
+  , first :: Maybe Text
+  , last  :: Maybe Text
   , page  :: Int
   -- , per_page     :: Int
   -- , total_pages  :: Int

@@ -9,7 +9,7 @@ module Examples.Intercom.Programs
   , firstConversation
   ) where
 
-import qualified Data.Text      as T
+import           Data.Text      (Text)
 import qualified Drive          as D
 import qualified Drive.Intercom as I
 
@@ -17,22 +17,22 @@ import qualified Drive.Intercom as I
 type IntercomP a = D.Free I.IntercomF a
 
 
-fetchConversation :: T.Text -> IntercomP I.Conversation
+fetchConversation :: Text -> IntercomP I.Conversation
 fetchConversation c
   = I.getConversation (I.ConversationID c)
 
 
-fetchUser :: T.Text -> IntercomP I.User
+fetchUser :: Text -> IntercomP I.User
 fetchUser c
   = I.getUser (I.UserID c)
 
 
-fetchAdmin :: T.Text -> IntercomP T.Text
+fetchAdmin :: Text -> IntercomP Text
 fetchAdmin c
   = I.adminName <$> I.getAdmin (I.AdminID c)
 
 
-fetchAllAdmins :: IntercomP [T.Text]
+fetchAllAdmins :: IntercomP [Text]
 fetchAllAdmins
   = (fmap . fmap) I.adminName I.listAdmins
 
@@ -42,7 +42,7 @@ fetchAllConversations
   = I.listConversations
 
 
-firstConversation :: IntercomP (Either T.Text I.Conversation)
+firstConversation :: IntercomP (Either Text I.Conversation)
 firstConversation = do
   cs <- I.listConversations
   case cs of

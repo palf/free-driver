@@ -5,17 +5,16 @@ module Main
   ( main
   ) where
 
+import           Control.Monad          (void)
+import           Control.Monad.Free     (Free (..))
+import           Control.Monad.IO.Class (MonadIO)
 import qualified Control.Monad.Reader   as R
+import           Data.Text              (Text)
 import qualified Data.Yaml              as Y
 import qualified Drive                  as D
 import qualified Drive.Describe         as D
 import qualified Drive.HTTP             as H
 import qualified Drive.Trello           as T
-
-import           Control.Monad          (void)
-import           Control.Monad.Free     (Free (..))
-import           Control.Monad.IO.Class (MonadIO)
-import           Data.Text              (Text)
 
 
 type DescribeP   = Free D.DescribeF

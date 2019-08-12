@@ -4,24 +4,22 @@ module Drive.Describe.API
   , warn
   ) where
 
+import           Data.Text            (Text)
+import           Drive                (Free, liftF)
 import           Drive.Describe.Types
 
-import qualified Data.Text            as T
 
-import           Drive                (Free, liftF)
-
-
-mkDescribe :: PriorityLevel -> T.Text -> Free DescribeF ()
+mkDescribe :: PriorityLevel -> Text -> Free DescribeF ()
 mkDescribe l t = liftF $ LogEntry l t ()
 
 
-debug :: T.Text -> Free DescribeF ()
+debug :: Text -> Free DescribeF ()
 debug = mkDescribe Debug
 
 
-verbose :: T.Text -> Free DescribeF ()
+verbose :: Text -> Free DescribeF ()
 verbose = mkDescribe Verbose
 
 
-warn :: T.Text -> Free DescribeF ()
+warn :: Text -> Free DescribeF ()
 warn = mkDescribe Warn

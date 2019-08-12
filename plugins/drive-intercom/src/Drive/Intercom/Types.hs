@@ -13,13 +13,12 @@ module Drive.Intercom.Types
   ) where
 
 import           Data.Aeson
-import qualified Data.Text                         as T
-import           GHC.Generics
-
+import           Data.Text                         (Text)
 import           Drive.Intercom.Types.Admins       as A
 import           Drive.Intercom.Types.Conversation as C
 import           Drive.Intercom.Types.Pagination   as P
 import           Drive.Intercom.Types.Users        as U
+import           GHC.Generics
 
 
 data IntercomF a
@@ -33,7 +32,7 @@ data IntercomF a
 
 
 newtype IntercomCredentials = IntercomCredentials
-  { authorization :: T.Text
+  { authorization :: Text
   } deriving (Show, Eq, Generic)
 
 instance FromJSON IntercomCredentials

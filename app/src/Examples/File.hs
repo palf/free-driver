@@ -4,14 +4,10 @@ module Main
   ( main
   ) where
 
+import           Data.Monoid    ((<>))
 import qualified Drive          as D
 import qualified Drive.Describe as D
 import qualified Drive.File     as F
-
-import           Data.Monoid    ((<>))
-
--- import Drive.NetworkSession
--- import Drive.Intercom.Conversation
 
 
 ff :: Monad m => (forall x. f x -> m x) -> D.Free f a -> m a

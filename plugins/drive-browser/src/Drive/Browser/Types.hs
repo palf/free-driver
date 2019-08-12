@@ -17,18 +17,16 @@ module Drive.Browser.Types
 
 import qualified Control.Monad.IO.Class as IOC
 import           Data.Aeson
-import qualified Data.Text              as T
-import qualified Test.WebDriver.Class   as W.Cl
-
 import           Data.Functor           (($>))
+import           Data.Monoid            ((<>))
+import           Data.Text              (Text)
+import qualified Data.Text              as Text
+import           Drive
 import qualified Drive                  as D
 import qualified Drive.Browser.Commands as C
 import           Drive.Browser.Ref
 import           Drive.Describe
--- import Drive ((type (-<)))
-import           Drive
-
-import           Data.Monoid            ((<>))
+import qualified Test.WebDriver.Class   as W.Cl
 
 
 newtype Url
@@ -42,12 +40,12 @@ deriving instance ToJSON Url
 data BrowserF a
   = GoToUrl Url a
   | Refresh a
-  | ReadTitle (T.Text -> a)
+  | ReadTitle (Text -> a)
   | ClickOn Ref a
   | Clear Ref a
-  | SendText Ref T.Text a
+  | SendText Ref Text a
   | PressEnter Ref a
-  | ReadText Ref (T.Text -> a)
+  | ReadText Ref (Text -> a)
   | Sleep Int a
   deriving (Functor)
 
@@ -77,7 +75,7 @@ browserToDescribeI (Sleep n a)         = logSleep n      $> a
 
 logGoToUrl :: String -> D.Free DescribeF ()
 logGoToUrl u
-  = verbose ("open (" <> T.pack u <> ")")
+  = verbose ("open (" <> Text.pack u <> ")")
 
 logRefresh :: D.Free DescribeF ()
 logRefresh
@@ -95,7 +93,7 @@ logClear :: Ref -> D.Free DescribeF ()
 logClear r
   = verbose ("clear (" <> showRef r <> ")")
 
-logSendText :: Ref -> T.Text -> D.Free DescribeF ()
+logSendText :: Ref -> Text -> D.Free DescribeF ()
 logSendText r t
   = verbose ("sendtext (" <> showRef r <> ", " <> t <> ")")
 
@@ -109,7 +107,7 @@ logReadText r
 
 logSleep :: Int -> D.Free DescribeF ()
 logSleep n
-  = warn ("sleep (" <> T.pack (show n) <> ")")
+  = warn ("sleep (" <> Text.pack (show n) <> ")")
 
 
 type SupportsBrowser m = (W.Cl.WebDriver m, IOC.MonadIO m)
