@@ -4,13 +4,13 @@ module Main
   ( main
   ) where
 
+import qualified Data.Aeson           as Aeson
 import qualified Data.ByteString.Lazy as BS
-import qualified Drive as V
-import qualified Data.Aeson            as Aeson
+import           Drive                ((>--->))
+import qualified Drive                as V
+import           Drive.Describe
+import           Drive.HTTP
 import           GHC.Generics         (Generic)
-import Drive.HTTP
-import Drive.Describe
-import Drive ((>--->))
 
 
 data Version = Version

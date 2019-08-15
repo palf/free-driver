@@ -5,10 +5,10 @@ module Main
   ) where
 
 import           Data.Monoid    ((<>))
+import           Drive          ((>--->))
 import qualified Drive          as V
-import Drive         ((>--->))
-import Drive.Describe
-import Drive.File
+import           Drive.Describe
+import           Drive.File
 
 
 program :: FileP ()

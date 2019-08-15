@@ -4,9 +4,11 @@ module Main
   ( main
   ) where
 
-import qualified Control.Monad.Reader as R
-import           Data.Text            (Text)
-import qualified Data.Text            as Text
+import qualified Control.Monad.Reader   as R
+import qualified Data.Text              as Text
+
+import           Control.Monad.IO.Class (liftIO)
+import           Data.Text              (Text)
 import           Drive
 import           Drive.Describe
 import           Drive.Slack
@@ -30,8 +32,8 @@ main :: IO ()
 main = do
   describe program >>= print
 
-  withSlackCredentials "credentials/slack.yaml" $ \creds -> do
-    R.runReaderT (run program) creds >>= print
+  withSlackCredentials "credentials/slack.yaml" $
+    R.runReaderT (run program >>= liftIO . print)
   >>= print
 
   where

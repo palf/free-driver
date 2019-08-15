@@ -10,4 +10,4 @@ packages:
   # - packages/drive-intercom
   - packages/drive-trello
   - packages/drive-slack
-  # # - app
+  - apps/trello-terminal

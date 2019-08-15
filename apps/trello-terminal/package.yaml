@@ -1,0 +1,28 @@
+name:                drive-trello-terminal
+version:             0.1.0.0
+github:              "palf/test-drive"
+license:             BSD3
+author:              "Jack Palfrey"
+maintainer:          "jack.palf@gmail.com"
+copyright:           "2019 Jack Palfrey"
+
+description:         Please see the README on Github at <https://github.com/palf/test-drive#readme>
+
+ghc-options: -Wall -threaded -rtsopts -with-rtsopts=-N
+
+dependencies:
+  - base >= 4.7 && < 5
+  - drive-base
+  - drive-trello
+  - drive-terminal
+  - drive-http
+  - yaml
+  - drive-describe
+  - text
+  - mtl
+
+executables:
+  example-drive-trello:
+    main: Main.hs
+    source-dirs: src
+

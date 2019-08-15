@@ -17,12 +17,12 @@ import qualified Data.Yaml              as Y
 import qualified Drive                  as D
 import qualified Drive.Describe         as D
 import qualified Web.Slack              as Slack
-import qualified Web.Slack.Api          as Api
-import qualified Web.Slack.Auth         as Auth
-import qualified Web.Slack.Channel      as Channel
+-- import qualified Web.Slack.Api          as Api
+-- import qualified Web.Slack.Auth         as Auth
+-- import qualified Web.Slack.Channel      as Channel
 import qualified Web.Slack.Chat         as Chat
 import qualified Web.Slack.Common       as Common
-import qualified Web.Slack.Im           as Im
+-- import qualified Web.Slack.Im           as Im
 import qualified Web.Slack.User         as User
 
 import           Control.Monad.IO.Class (MonadIO)
@@ -31,7 +31,7 @@ import           Data.Text              (Text)
 import           Drive.Slack.Types
 
 
-data SlackCredentialsError
+newtype SlackCredentialsError
   = NotFound String
   deriving (Show)
 

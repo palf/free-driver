@@ -21,13 +21,13 @@ import           Drive.HTTP
 import           Drive.Terminal
 import           Drive.Trello
 
-type Combo = TA TrelloF TerminalF
-type ComboP a = Free Combo a
-type Fuck a = Either HttpError (Either TrelloError a)
+
+type ProgramF = Combo TrelloF TerminalF
+type ProgramP a = Free ProgramF a
+type Errors a = Either HttpError (Either TrelloError a)
 
 
-
-program :: ComboP [Text]
+program :: ProgramP [Text]
 program = do
   i <- Text.pack <$> liftR readInput
   liftL $ fmap boardName <$> getBoards (User i)
@@ -46,32 +46,31 @@ main = do
     print ("done" :: String)
 
   where
-    describe = foldFree execDescribe . foldFree comboAsDescribe
+    describe = programAsDescribe >---> execDescribe
 
-    comboAsDescribe :: Combo a -> Free DescribeF a
-    comboAsDescribe = bimapI trelloToDescribeI terminalToDescribeI
+    programAsDescribe :: ProgramF a -> DescribeP a
+    programAsDescribe = trelloToDescribeI >---< terminalToDescribeI
 
     runApi
       = foldEitherEitherFree (bimapI' execTrello execTerminal')
 
-    execTerminal' :: (MonadIO m) => TerminalF a -> m (Fuck a)
+    execTerminal' :: (MonadIO m) => TerminalF a -> m (Errors a)
     execTerminal' = fmap (Right . Right)  . execTerminal
-
 
 
 
 bimapI'
   :: (Functor m)
-  => (f a -> m (Fuck a))
-  -> (g a -> m (Fuck a))
+  => (f a -> m (Errors a))
+  -> (g a -> m (Errors a))
   -> ( f :+: g ) a
-  -> m (Fuck a)
+  -> m (Errors a)
 
-bimapI' f _ (D t) = f t
+bimapI' f _ (L t) = f t
 bimapI' _ f (R t) = f t
 
 
-execTrello :: (MonadIO m, R.MonadReader TrelloAuth m) => TrelloF a -> m (Fuck a)
+execTrello :: (MonadIO m, R.MonadReader TrelloAuth m) => TrelloF a -> m (Errors a)
 execTrello
   = foldEitherFree execHttpUri
   . trelloToNetworkI

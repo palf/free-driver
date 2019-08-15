@@ -1,0 +1,41 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.31.2.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: 56a67620843c89e005289e3567023f55f6fba73a1027a9ff5fa8345921a5f82c
+
+name:           drive-trello-terminal
+version:        0.1.0.0
+description:    Please see the README on Github at <https://github.com/palf/test-drive#readme>
+homepage:       https://github.com/palf/test-drive#readme
+bug-reports:    https://github.com/palf/test-drive/issues
+author:         Jack Palfrey
+maintainer:     jack.palf@gmail.com
+copyright:      2019 Jack Palfrey
+license:        BSD3
+build-type:     Simple
+
+source-repository head
+  type: git
+  location: https://github.com/palf/test-drive
+
+executable example-drive-trello
+  main-is: Main.hs
+  other-modules:
+      Paths_drive_trello_terminal
+  hs-source-dirs:
+      src
+  ghc-options: -Wall -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+    , drive-base
+    , drive-describe
+    , drive-http
+    , drive-terminal
+    , drive-trello
+    , mtl
+    , text
+    , yaml
+  default-language: Haskell2010

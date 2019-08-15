@@ -6,9 +6,9 @@ module Main
   ( main
   ) where
 
-import           Data.Text              (Text)
-import qualified Drive as V
-import Drive
+import           Data.Text      (Text)
+import           Drive
+import qualified Drive          as V
 import           Drive.Browser
 import           Drive.Describe
 

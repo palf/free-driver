@@ -1,6 +1,6 @@
-{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TypeOperators    #-}
+{-# LANGUAGE TypeOperators     #-}
 
 module Main
   ( main
@@ -12,9 +12,9 @@ import qualified Control.Monad.Reader   as R
 import           Data.Text              (Text)
 import qualified Data.Yaml              as Y
 import qualified Drive                  as V
-import Drive.Describe
-import Drive.HTTP
-import Drive.Trello
+import           Drive.Describe
+import           Drive.HTTP
+import           Drive.Trello
 
 
 type HttpTrelloP = Free (HttpUriF TrelloAuth)
