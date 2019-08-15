@@ -1,15 +1,13 @@
 resolver: lts-13.10
 
 packages:
-  - plugins/drive-base
-  - plugins/drive-describe
-  - plugins/drive-file
-  - plugins/drive-http
-  - plugins/drive-browser
-  - plugins/drive-intercom
-  - plugins/drive-trello
-  - plugins/drive-slack
-  - app
-
-extra-deps:
-  - slack-api-0.12
+  - packages/drive-base
+  - packages/drive-describe
+  - packages/drive-terminal
+  - packages/drive-file
+  - packages/drive-http
+  - packages/drive-browser
+  # - packages/drive-intercom
+  - packages/drive-trello
+  - packages/drive-slack
+  # # - app

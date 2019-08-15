@@ -6,3 +6,4 @@ logs
 resources
 *.log
 credentials
+write-example.txt

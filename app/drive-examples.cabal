@@ -43,6 +43,7 @@ executable drive-http
   build-depends:       base
                      , drive-base
                      , drive-http
+                     , free
                      , bytestring
                      , yaml
   ghc-options:         -Wall -threaded -rtsopts -with-rtsopts=-N
@@ -58,6 +59,7 @@ executable drive-browser
                      , drive-base
                      , drive-browser
                      , drive-describe
+                     , webdriver
                      , text
   ghc-options:         -Wall -threaded -rtsopts -with-rtsopts=-N
   default-extensions:  OverloadedStrings
@@ -83,6 +85,42 @@ executable drive-trello
   default-language:    Haskell2010
 
 
+executable drive-terminal
+  hs-source-dirs:      src
+  main-is:             Examples/Terminal.hs
+  build-depends:       base
+                     , drive-base
+                     , drive-terminal
+                     , drive-describe
+                     , text
+                     , free
+                     , yaml
+                     , mtl
+  ghc-options:         -Wall -threaded -rtsopts -with-rtsopts=-N
+  default-extensions:  OverloadedStrings
+                     , RankNTypes
+  default-language:    Haskell2010
+
+
+executable drive-trello-terminal
+  hs-source-dirs:      src
+  main-is:             Examples/TrelloTerminal.hs
+  build-depends:       base
+                     , drive-base
+                     , drive-describe
+                     , drive-http
+                     , drive-terminal
+                     , drive-trello
+                     , free
+                     , mtl
+                     , text
+                     , yaml
+  ghc-options:         -Wall -threaded -rtsopts -with-rtsopts=-N
+  default-extensions:  OverloadedStrings
+                     , RankNTypes
+  default-language:    Haskell2010
+
+
 executable drive-slack
   hs-source-dirs:      src
   main-is:             Examples/Slack.hs
@@ -90,7 +128,8 @@ executable drive-slack
                      , drive-base
                      , drive-slack
                      , drive-describe
-                     , slack-api
+                     , slack-web
+                     , mtl
                      , text
                      , bytestring
                      , yaml
@@ -168,3 +207,4 @@ test-suite drive-test
 source-repository head
   type:     git
   location: https://github.com/palf/free-driver
+

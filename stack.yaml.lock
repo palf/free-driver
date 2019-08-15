@@ -3,14 +3,7 @@
 # For more information, please see the documentation at:
 #   https://docs.haskellstack.org/en/stable/lock_files
 
-packages:
-- completed:
-    hackage: slack-api-0.12@sha256:7bb8d067d33fdc69011b2bdb64a071873bfcbfe637a736dcaa97d41ef345b735,3463
-    pantry-tree:
-      size: 2384
-      sha256: 1ca64bed931cb3397c9ab15c2316814c6f4992a791308a63a6d6e5ef80c03823
-  original:
-    hackage: slack-api-0.12
+packages: []
 snapshots:
 - completed:
     size: 496698

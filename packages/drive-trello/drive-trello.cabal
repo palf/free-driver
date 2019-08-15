@@ -1,0 +1,64 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.31.2.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: d87fefc0f2cb35bafa88c3dcf950c0ad357910dffff7ec5da95dd02238e7d42c
+
+name:           drive-trello
+version:        0.1.0.0
+description:    Please see the README on Github at <https://github.com/palf/test-drive#readme>
+homepage:       https://github.com/palf/test-drive#readme
+bug-reports:    https://github.com/palf/test-drive/issues
+author:         Jack Palfrey
+maintainer:     jack.palf@gmail.com
+copyright:      2019 Jack Palfrey
+license:        BSD3
+build-type:     Simple
+
+source-repository head
+  type: git
+  location: https://github.com/palf/test-drive
+
+library
+  exposed-modules:
+      Drive.Trello
+  other-modules:
+      Drive.Trello.API
+      Drive.Trello.Handlers
+      Drive.Trello.Types
+      Paths_drive_trello
+  hs-source-dirs:
+      lib
+  ghc-options: -Wall
+  build-depends:
+      aeson
+    , base >=4.7 && <5
+    , drive-base
+    , drive-describe
+    , drive-http
+    , free
+    , lens
+    , text
+    , wreq
+  default-language: Haskell2010
+
+executable example-drive-trello
+  main-is: Main.hs
+  other-modules:
+      Paths_drive_trello
+  hs-source-dirs:
+      src
+  ghc-options: -Wall -Wall -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+    , drive-base
+    , drive-describe
+    , drive-http
+    , drive-trello
+    , free
+    , mtl
+    , text
+    , yaml
+  default-language: Haskell2010
