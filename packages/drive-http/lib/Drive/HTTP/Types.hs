@@ -15,7 +15,7 @@ type Uri = String
 
 
 data HttpError
-  = RequestError
+  = RequestError String
   | NoContent
   deriving (Show)
 

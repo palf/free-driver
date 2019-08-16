@@ -52,22 +52,22 @@ main = do
     programAsDescribe = trelloToDescribeI >---< terminalToDescribeI
 
     runApi
-      = foldEitherEitherFree (bimapI' execTrello execTerminal')
+      = foldEitherEitherFree (combineI' execTrello execTerminal')
 
     execTerminal' :: (MonadIO m) => TerminalF a -> m (Errors a)
     execTerminal' = fmap (Right . Right)  . execTerminal
 
 
 
-bimapI'
+combineI'
   :: (Functor m)
   => (f a -> m (Errors a))
   -> (g a -> m (Errors a))
   -> ( f :+: g ) a
   -> m (Errors a)
 
-bimapI' f _ (L t) = f t
-bimapI' _ f (R t) = f t
+combineI' f _ (L t) = f t
+combineI' _ f (R t) = f t
 
 
 execTrello :: (MonadIO m, R.MonadReader TrelloAuth m) => TrelloF a -> m (Errors a)

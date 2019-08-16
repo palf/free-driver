@@ -17,13 +17,13 @@ module Drive.Interpreter
   , liftL
   , liftR
 
-  , splitI
+  , copyI
   , (<--->)
 
   , chainI
   , (>--->)
 
-  , bimapI
+  , combineI
   , (>---<)
   ) where
 
@@ -45,6 +45,21 @@ type Interpreter f g a
   = f a -> Free g a
 
 
+infixl 9 <--->
+(<--->) :: (Functor f, Functor g) => (t a -> Free f a) -> (t a -> Free g a) -> (t a -> Free (f :+: g) a)
+(<--->) = copyI
+
+
+infixl 9 >--->
+(>--->) :: (Functor f, Monad g) => (forall y. (p y -> Free f y)) -> (forall x. (f x -> g x)) -> (Free p b -> g b)
+(>--->) a b = chainI b a
+
+
+infixl 9 >---<
+(>---<) :: (f a -> m a) -> (g a -> m a) -> ( f :+: g ) a -> m a
+(>---<) = combineI
+
+
 identityI :: (Functor f) => Interpreter f f a
 identityI = Free.liftF
 
@@ -57,19 +72,14 @@ liftR :: (Functor f, Functor g) => Free g a -> Free (f :+: g) a
 liftR = Free.hoistFree R
 
 
-splitI
+copyI
   :: (Functor f, Functor g)
   => Interpreter t f a
   -> Interpreter t g a
   -> Interpreter t (f :+: g) a
 
-splitI a b c
+copyI a b c
   = liftL (a c) >> liftR (b c)
-
-
-infixl 9 <--->
-(<--->) :: (Functor f, Functor g) => (t a -> Free f a) -> (t a -> Free g a) -> (t a -> Free (f :+: g) a)
-(<--->) = splitI
 
 
 chainI
@@ -82,22 +92,11 @@ chainI a b
   = Free.foldFree a . Free.foldFree b
 
 
-infixl 9 >--->
-(>--->) :: (Functor f, Monad g) => (forall y. (p y -> Free f y)) -> (forall x. (f x -> g x)) -> (Free p b -> g b)
-(>--->) a b = chainI b a
-
-
-bimapI
+combineI
   :: NatTran f m a
   -> NatTran g m a
   -> ( f :+: g ) a
   -> m a
 
-bimapI f _ (L t) = f t
-bimapI _ f (R t) = f t
-
-
-infixl 9 >---<
-(>---<) :: (f a -> m a) -> (g a -> m a) -> ( f :+: g ) a -> m a
-(>---<) = bimapI
-
+combineI f _ (L t) = f t
+combineI _ f (R t) = f t

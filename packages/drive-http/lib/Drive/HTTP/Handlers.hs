@@ -110,10 +110,10 @@ runGet opts u
             let x = res ^. responseBody
             pure $ Right x
 
-          _ -> pure (Left RequestError)
+          x -> pure (Left $ RequestError $ show x)
       )
       handle
 
   where
     handle :: (MonadIO m) => HttpException -> m (Either HttpError D.ByteString)
-    handle _e = pure (Left RequestError)
+    handle e = pure (Left $ RequestError $ show e)

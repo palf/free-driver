@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 56a67620843c89e005289e3567023f55f6fba73a1027a9ff5fa8345921a5f82c
+-- hash: afc3c43e15ee9169c426857efb594daa267bdb4260b711ce9fc24e56471ff97d
 
 name:           drive-trello-terminal
 version:        0.1.0.0
@@ -21,7 +21,7 @@ source-repository head
   type: git
   location: https://github.com/palf/test-drive
 
-executable example-drive-trello
+executable app-drive-trello-terminal
   main-is: Main.hs
   other-modules:
       Paths_drive_trello_terminal

@@ -1,4 +1,3 @@
-{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE RankNTypes #-}
 
 module Drive
@@ -14,27 +13,29 @@ module Drive
 import           Control.Monad.Free (Free (..))
 import qualified Control.Monad.Free as Free
 import           Drive.Interpreter  as X
+import Control.Monad.Trans.Maybe
+import Control.Monad.Except
 
 
-newtype EitherT e m a = EitherT {runEitherT :: m (Either e a)}
+-- newtype ExceptT e m a = ExceptT {runExceptT :: m (Either e a)}
 
-instance Functor m => Functor (EitherT e m) where
-  fmap f (EitherT m) = EitherT $ (fmap . fmap) f m
+-- instance Functor m => Functor (ExceptT e m) where
+--   fmap f (ExceptT m) = ExceptT $ (fmap . fmap) f m
 
-instance Monad m => Applicative (EitherT e m) where
-  pure = EitherT . pure . Right
-  EitherT f <*> EitherT v =
-    EitherT $ f >>= either
-      (pure . Left)
-      (\k -> fmap k <$> v)
+-- instance Monad m => Applicative (ExceptT e m) where
+--   pure = ExceptT . pure . Right
+--   ExceptT f <*> ExceptT v =
+--     ExceptT $ f >>= either
+--       (pure . Left)
+--       (\k -> fmap k <$> v)
 
 
-instance Monad m => Monad (EitherT e m) where
-  return = pure
-  EitherT x >>= f =
-    EitherT $ x >>= either
-      (pure . Left)
-      (runEitherT . f)
+-- instance Monad m => Monad (ExceptT e m) where
+--   return = pure
+--   ExceptT x >>= f =
+--     ExceptT $ x >>= either
+--       (pure . Left)
+--       (runExceptT . f)
 
 
 foldEitherFree
@@ -43,7 +44,7 @@ foldEitherFree
   -> Free t a
   -> m (Either e a)
 
-foldEitherFree f = runEitherT . Free.foldFree (EitherT . f)
+foldEitherFree f = runExceptT . Free.foldFree (ExceptT . f)
 
 --foldEitherFree _ (Pure v) = pure (Right v)
 --foldEitherFree f (Free p) = f p >>= \x ->
@@ -75,7 +76,9 @@ foldMaybeFree
   -> Free t b
   -> f (Maybe b)
 
-foldMaybeFree _ (Pure v) = pure (Just v)
-foldMaybeFree f (Free p) = f p >>= \case
-    Nothing ->  pure Nothing
-    Just v -> foldMaybeFree f v
+foldMaybeFree f = runMaybeT . Free.foldFree (MaybeT . f)
+
+-- foldMaybeFree _ (Pure v) = pure (Just v)
+-- foldMaybeFree f (Free p) = f p >>= \case
+--     Nothing ->  pure Nothing
+--     Just v -> foldMaybeFree f v

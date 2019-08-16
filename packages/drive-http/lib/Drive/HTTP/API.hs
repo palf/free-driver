@@ -4,6 +4,8 @@
 
 module Drive.HTTP.API
   ( HttpP
+  , HttpUriP
+  , HttpHeaderP
   , W.defaults
   , get
   , getRaw
@@ -23,6 +25,8 @@ import qualified Network.Wreq          as W
 makeFree ''HttpUriF
 
 type HttpP = Free HttpF
+type HttpUriP a = Free (HttpUriF a)
+type HttpHeaderP a = Free (HttpHeaderF a)
 
 
 get :: (Aeson.FromJSON a) => W.Options -> String -> Free HttpF (Maybe a)
@@ -37,7 +41,7 @@ getRawUrl
   :: forall x.
       W.Options
    -> (x -> String)
-   -> Free (HttpUriF x) (Either HttpError D.ByteString)
+   -> HttpUriP x (Either HttpError D.ByteString)
 
 getRawUrl = getUri
 -- getRawUrl opts f
@@ -48,5 +52,5 @@ getRawUrl = getUri
 --           )
 
 
-getRawOpts :: (y -> W.Options) -> String -> Free (HttpHeaderF y) D.ByteString
+getRawOpts :: (a -> W.Options) -> String -> HttpHeaderP a D.ByteString
 getRawOpts f u = liftF (GetOptions f u id)

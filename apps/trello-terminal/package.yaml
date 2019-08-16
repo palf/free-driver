@@ -22,7 +22,7 @@ dependencies:
   - mtl
 
 executables:
-  example-drive-trello:
+  app-drive-trello-terminal:
     main: Main.hs
     source-dirs: src
 

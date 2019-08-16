@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 86270946fbdee689acc31fb99ba038eb1e1f030edd59899c5996ea31b1091905
+-- hash: 81748c7b7bc6b84bd5011f08f8eb7bf539b7e0fbd49c9439ffbe81bcdd97a782
 
 name:           drive-base
 version:        0.1.0.0
@@ -33,4 +33,6 @@ library
   build-depends:
       base >=4.7 && <5
     , free
+    , mtl
+    , transformers
   default-language: Haskell2010

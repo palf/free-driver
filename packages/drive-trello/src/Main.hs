@@ -1,143 +1,91 @@
+{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeOperators     #-}
 
 module Main
   ( main
+  , program
+  , run
   ) where
 
-import           Control.Monad.Free     (Free (..))
-import           Control.Monad.IO.Class (MonadIO)
+import           Control.Monad.IO.Class (MonadIO, liftIO)
 import qualified Control.Monad.Reader   as R
 import           Data.Text              (Text)
 import qualified Data.Yaml              as Y
 import qualified Drive                  as V
+import Drive
 import           Drive.Describe
 import           Drive.HTTP
+import Control.Monad.Except
 import           Drive.Trello
 
 
-type HttpTrelloP = Free (HttpUriF TrelloAuth)
-
-
 program :: TrelloP [Text]
-program =
+program = do
+  fmap boardName <$> getBoards (User "jackpalfrey3")
+  fmap boardName <$> getBoards (User "jackpalfrey3")
   fmap boardName <$> getBoards (User "jackpalfrey3")
 
 
-asDebug :: TrelloP a -> DescribeP a
-asDebug = V.foldFree trelloToDescribeI
+withTrelloCredentials :: FilePath -> R.ReaderT TrelloAuth IO a -> IO (Either Y.ParseException a)
+withTrelloCredentials p f =
+  Y.decodeFileEither p >>=
+    either (pure . Left) (\x -> Right <$> R.runReaderT f x)
 
 
-asHttp :: TrelloP a -> HttpTrelloP (Either TrelloError a)
-asHttp = V.foldEitherFree trelloToNetworkI
-
-
-httpAsDescribe :: TrelloAuth -> HttpTrelloP a -> DescribeP a
-httpAsDescribe auth = V.foldFree (httpUriToDescribe auth)
-
-
-asVerbose
-  :: TrelloP a
-  -> R.ReaderT TrelloAuth DescribeP (Either TrelloError a)
-
-asVerbose p
-  = R.ask >>= \auth -> R.lift $ httpAsDescribe auth $ asHttp p
-
-
-runDescribe :: (MonadIO m) => DescribeP a -> m a
-runDescribe = V.foldFree execDescribe
-
-
-runDescribeR :: (MonadIO m, R.MonadReader r m) => R.ReaderT r DescribeP a -> m a
-runDescribeR p = R.ask >>= V.foldFree execDescribe . R.runReaderT p
-
-
-runHttp
-  :: (MonadIO m, R.MonadReader TrelloAuth m)
-  => HttpTrelloP a
-  -> m (Either HttpError a)
-
-runHttp = V.foldEitherFree execHttpUri
+run = withTrelloCredentials "credentials/trello.yaml"
 
 
 main :: IO ()
 main = do
-  describe program >>= print
+  -- describe program >>= print
 
-  withTrelloCredentials "credentials/trello.yaml" $ \auth -> do
-    trelloVerboseDescribe auth
-    trelloInterleavedDescribe auth
-    trelloExecuting auth
-    trelloExecutingInterleavedDescribe auth
+  withTrelloCredentials "credentials/trello.yaml" $ do
+    -- describeVerbose program >>= liftIO . print
+    describeBoth program >>= liftIO . print
+    -- runSilent program >>= liftIO . print
+    -- runDescribe program >>= liftIO . print
+  >>= print
 
   where
     describe :: (MonadIO m) => TrelloP a -> m a
-    describe = runDescribe . asDebug
+    describe = trelloToDescribeI >---> execDescribe
 
 
-withTrelloCredentials :: FilePath -> (TrelloAuth -> IO a) -> IO ()
-withTrelloCredentials p f =
-  Y.decodeFileEither p >>=
-    either print (\x -> f x >> pure ())
+    describeVerbose :: (R.MonadReader TrelloAuth m, MonadIO m) => TrelloP a -> m (Either TrelloError a)
+    describeVerbose p = do
+      auth <- R.ask
+      ((httpUriToDescribe auth >---> execDescribe)
+        . runExceptT
+        . foldFree (ExceptT . trelloToNetworkI)) p
+
+      where
+        -- f :: (MonadIO m) => TrelloAuth -> HttpUriP TrelloAuth b -> m b
+        -- f auth =
+
+--         k
+--           :: (forall x. TrelloF x -> ExceptT TrelloError (Free (HttpUriF TrelloAuth)) x)
+--           -> TrelloP a
+--           -> HttpUriP TrelloAuth (Either TrelloError a)
+
+--         k q = runExceptT . foldFree q
 
 
+    describeBoth :: (MonadIO m, R.MonadReader TrelloAuth m) => TrelloP a -> m (Either TrelloError a)
+    describeBoth = undefined
+--     describeBoth
+--       = (trelloToDescribeI <---> V.identityI) >---> ((fmap Right execDescribe) >---< describeVerbose)
 
 
-trelloVerboseDescribe :: TrelloAuth -> IO ()
-trelloVerboseDescribe auth =
-  R.runReaderT (run program) auth >>= print
-
-    where
-      run
-        :: (MonadIO m, R.MonadReader TrelloAuth m)
-        => TrelloP a
-        -> m (Either TrelloError a)
-
-      run = runDescribeR . asVerbose
+    runSilent :: (MonadIO m, R.MonadReader TrelloAuth m) => TrelloP a -> m (Either HttpError (Either TrelloError a))
+    runSilent = V.foldEitherFree execHttpUri . V.foldEitherFree trelloToNetworkI
 
 
-trelloInterleavedDescribe :: TrelloAuth -> IO ()
-trelloInterleavedDescribe auth =
-  R.runReaderT (run program) auth >>= print
-
-    where
-      run
-        :: (MonadIO m, R.MonadReader TrelloAuth m)
-        => TrelloP a
-        -> m (a, Either TrelloError a)
-
-      run p = do
-        r1 <- runDescribe $ asDebug p
-        r2 <- runDescribeR $ asVerbose p
-        pure (r1, r2)
-
-
-trelloExecuting :: TrelloAuth -> IO ()
-trelloExecuting auth =
-  R.runReaderT (run program) auth >>= print
-
-    where
-      run
-        :: (MonadIO m, R.MonadReader TrelloAuth m)
-        => TrelloP a
-        -> m (Either HttpError (Either TrelloError a))
-
-      run = runHttp . asHttp
-
-
-trelloExecutingInterleavedDescribe :: TrelloAuth -> IO ()
-trelloExecutingInterleavedDescribe auth =
-  R.runReaderT (run program) auth >>= print
-
-    where
-      run
-        :: (MonadIO m, R.MonadReader TrelloAuth m)
-        => TrelloP a
-        -> m (a, Either TrelloError a, Either HttpError (Either TrelloError a))
-
-      run p = do
-        r1 <- runDescribe $ asDebug p
-        r2 <- runDescribeR $ asVerbose p
-        r3 <- runHttp $ asHttp p
-        pure (r1, r2, r3)
+    runDescribe :: (MonadIO m, R.MonadReader TrelloAuth m) => TrelloP a -> m (a, Either TrelloError a, Either HttpError (Either TrelloError a))
+    runDescribe p = do
+      r1 <- describe p
+      r2 <- describeVerbose p
+      r3 <- (V.foldEitherFree execHttpUri . V.foldEitherFree trelloToNetworkI) p
+      pure (r1, r2, r3)

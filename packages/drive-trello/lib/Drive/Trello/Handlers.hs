@@ -16,26 +16,21 @@ import           Data.Functor       (($>))
 import           Data.Monoid        ((<>))
 import           Data.Text          (Text)
 import qualified Data.Text          as Text
-import qualified Drive              as D
-import qualified Drive.Describe     as D
-import qualified Drive.HTTP         as H
+import Drive.Describe
+import Drive.HTTP
 import           Drive.Trello.Types
 import qualified Network.Wreq       as W
 
 
-type DescribeP   = D.Free D.DescribeF
-type HttpTrelloP = D.Free (H.HttpUriF TrelloAuth)
-
-
 data TrelloError
   = DecodeError String
-  | RequestFailed H.HttpError
+  | RequestFailed HttpError
   deriving (Show)
 
 
 trelloToDescribeI :: TrelloF a -> DescribeP a
 trelloToDescribeI (GetBoards u f)
-  = D.debug ("getting boards for user \"" <> showUser u <> "\"") $> f []
+  = debug ("getting boards for user \"" <> showUser u <> "\"") $> f []
 
 
 showUser :: User -> Text
@@ -49,7 +44,7 @@ opts
 
 --liftError :: Contains es e => e -> Either es a
 
-trelloToNetworkI :: TrelloF a -> HttpTrelloP (Either TrelloError a)
+trelloToNetworkI :: TrelloF a -> HttpUriP TrelloAuth (Either TrelloError a)
 trelloToNetworkI (GetBoards u f) =
   either
     (Left . RequestFailed)
@@ -58,9 +53,9 @@ trelloToNetworkI (GetBoards u f) =
       (Right . f)
       (eitherDecode v)
     )
-  <$> H.getRawUrl opts (getPath u)
+  <$> getRawUrl opts (getPath u)
 
-  --f <$> mapEitherT (injectToSum....) $ liftEitherT $ eitherDecode =<< H.getRawUrl opts (getPath u)
+  --f <$> mapExceptT (injectToSum....) $ liftExceptT $ eitherDecode =<< H.getRawUrl opts (getPath u)
 
 
 getPath :: User -> TrelloAuth -> String
