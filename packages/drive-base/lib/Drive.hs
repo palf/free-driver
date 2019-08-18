@@ -10,11 +10,11 @@ module Drive
   , foldMaybeFree
   ) where
 
-import           Control.Monad.Free (Free (..))
-import qualified Control.Monad.Free as Free
-import           Drive.Interpreter  as X
-import Control.Monad.Trans.Maybe
-import Control.Monad.Except
+import           Control.Monad.Except
+import           Control.Monad.Free        (Free (..))
+import qualified Control.Monad.Free        as Free
+import           Control.Monad.Trans.Maybe
+import           Drive.Interpreter         as X
 
 
 -- newtype ExceptT e m a = ExceptT {runExceptT :: m (Either e a)}

@@ -16,17 +16,17 @@ module Drive.Browser.Types
   ) where
 
 import qualified Control.Monad.IO.Class as IOC
+import qualified Data.Text              as Text
+import qualified Drive                  as D
+import qualified Drive.Browser.Commands as C
+import qualified Test.WebDriver.Class   as W.Cl
+
 import           Data.Aeson
 import           Data.Functor           (($>))
 import           Data.Monoid            ((<>))
 import           Data.Text              (Text)
-import qualified Data.Text              as Text
-import           Drive
-import qualified Drive                  as D
-import qualified Drive.Browser.Commands as C
 import           Drive.Browser.Ref
 import           Drive.Describe
-import qualified Test.WebDriver.Class   as W.Cl
 
 
 newtype Url
@@ -61,7 +61,7 @@ instance (ToJSON a) => ToJSON (BrowserF a) where
   toJSON = undefined
 
 
-browserToDescribeI :: Interpreter BrowserF DescribeF a
+browserToDescribeI :: BrowserF a -> DescribeP a
 browserToDescribeI (GoToUrl (Url u) a) = logGoToUrl u    $> a
 browserToDescribeI (Refresh a)         = logRefresh      $> a
 browserToDescribeI (ReadTitle a)       = logReadTitle    $> a "some page title"

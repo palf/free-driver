@@ -16,8 +16,8 @@ import           Data.Functor       (($>))
 import           Data.Monoid        ((<>))
 import           Data.Text          (Text)
 import qualified Data.Text          as Text
-import Drive.Describe
-import Drive.HTTP
+import           Drive.Describe
+import           Drive.HTTP
 import           Drive.Trello.Types
 import qualified Network.Wreq       as W
 

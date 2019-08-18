@@ -78,9 +78,8 @@ execHttpUri
   -> m (Either HttpError a)
 
 execHttpUri (GetUri opts u a) = do
-  x <- ask
-  let u' = u x
-  (fmap . fmap) (a . Right) (runGet opts u')
+  x <- u <$> ask
+  (fmap . fmap) (a . Right) (runGet opts x)
 
 
 execHttpHeader
@@ -105,15 +104,14 @@ runGet opts u
       ( do
         res <- W.getWith opts u
 
-        case res ^. (responseStatus . statusCode) of
+        pure $ case res ^. (responseStatus . statusCode) of
           200 -> do
-            let x = res ^. responseBody
-            pure $ Right x
+            Right (res ^. responseBody)
 
-          x -> pure (Left $ RequestError $ show x)
+          x -> (Left $ RequestError $ show x)
       )
-      handle
+      (pure . handle)
 
   where
-    handle :: (MonadIO m) => HttpException -> m (Either HttpError D.ByteString)
-    handle e = pure (Left $ RequestError $ show e)
+    handle :: HttpException -> Either HttpError D.ByteString
+    handle e = Left $ RequestError $ show e

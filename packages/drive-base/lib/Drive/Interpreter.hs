@@ -9,8 +9,7 @@
 {-# LANGUAGE TypeOperators         #-}
 
 module Drive.Interpreter
-  ( Interpreter
-  , Combo (..)
+  ( Combo (..)
   , (:+:)
 
   , identityI
@@ -37,13 +36,6 @@ data Combo f g a
   deriving (Functor)
 
 
-type NatTran f g a
-  = f a -> g a
-
-
-type Interpreter f g a
-  = f a -> Free g a
-
 
 infixl 9 <--->
 (<--->) :: (Functor f, Functor g) => (t a -> Free f a) -> (t a -> Free g a) -> (t a -> Free (f :+: g) a)
@@ -60,7 +52,7 @@ infixl 9 >---<
 (>---<) = combineI
 
 
-identityI :: (Functor f) => Interpreter f f a
+identityI :: (Functor f) => (f a -> Free f a)
 identityI = Free.liftF
 
 
@@ -74,9 +66,9 @@ liftR = Free.hoistFree R
 
 copyI
   :: (Functor f, Functor g)
-  => Interpreter t f a
-  -> Interpreter t g a
-  -> Interpreter t (f :+: g) a
+  => (t a -> Free f a)
+  -> (t a -> Free g a)
+  -> (t a -> Free (f :+: g) a)
 
 copyI a b c
   = liftL (a c) >> liftR (b c)
@@ -84,8 +76,8 @@ copyI a b c
 
 chainI
   :: (Functor g, Monad h)
-  => (forall x. NatTran g h x)
-  -> (forall y. Interpreter f g y)
+  => (forall x. (g x -> h x))
+  -> (forall y. (f y -> Free g y))
   -> (Free f a -> h a)
 
 chainI a b
@@ -93,10 +85,14 @@ chainI a b
 
 
 combineI
-  :: NatTran f m a
-  -> NatTran g m a
+  :: (f a -> m a)
+  -> (g a -> m a)
   -> ( f :+: g ) a
   -> m a
 
-combineI f _ (L t) = f t
-combineI _ f (R t) = f t
+-- combineI f _ (L t) = f t
+-- combineI _ f (R t) = f t
+
+combineI f g t = case t of
+                   (L x) -> f x
+                   (R x) -> g x

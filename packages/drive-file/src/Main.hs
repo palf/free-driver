@@ -4,9 +4,10 @@ module Main
   ( main
   ) where
 
+import qualified Drive          as V
+
 import           Data.Monoid    ((<>))
 import           Drive          ((>--->))
-import qualified Drive          as V
 import           Drive.Describe
 import           Drive.File
 
@@ -30,5 +31,5 @@ main = do
       . (V.identityI >---> execFile)
 
 
-fileToDescribeI :: V.Interpreter FileF DescribeF a
+fileToDescribeI :: FileF a -> DescribeP a
 fileToDescribeI (WriteFile t a) = a <$ debug ("writing to file \"" <> t <> "\"")
