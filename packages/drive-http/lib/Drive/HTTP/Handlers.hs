@@ -78,7 +78,7 @@ execHttpUri
   -> m (Either HttpError a)
 
 execHttpUri (GetUri opts u a) = do
-  x <- u <$> ask
+  x <- asks u
   (fmap . fmap) (a . Right) (runGet opts x)
 
 
@@ -105,10 +105,8 @@ runGet opts u
         res <- W.getWith opts u
 
         pure $ case res ^. (responseStatus . statusCode) of
-          200 -> do
-            Right (res ^. responseBody)
-
-          x -> (Left $ RequestError $ show x)
+          200 -> Right (res ^. responseBody)
+          x   -> Left $ RequestError $ show x
       )
       (pure . handle)
 

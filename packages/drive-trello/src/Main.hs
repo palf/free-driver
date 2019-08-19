@@ -5,18 +5,17 @@
 
 module Main
   ( main
-  , program
-  , run
   ) where
+
+import qualified Control.Monad.Reader   as R
+import qualified Data.Yaml              as Y
+import qualified Drive                  as V
 
 import           Control.Monad.Except
 import           Control.Monad.Free
 import           Control.Monad.IO.Class (MonadIO, liftIO)
-import qualified Control.Monad.Reader   as R
 import           Data.Text              (Text)
-import qualified Data.Yaml              as Y
 import           Drive
-import qualified Drive                  as V
 import           Drive.Describe
 import           Drive.HTTP
 import           Drive.Trello
@@ -24,8 +23,8 @@ import           Drive.Trello
 
 program :: TrelloP [Text]
 program = do
-  fmap boardName <$> getBoards (User "jackpalfrey3")
-  fmap boardName <$> getBoards (User "jackpalfrey3")
+  _ <- fmap boardName <$> getBoards (User "jackpalfrey3")
+  _ <- fmap boardName <$> getBoards (User "jackpalfrey3")
   fmap boardName <$> getBoards (User "jackpalfrey3")
 
 
@@ -35,9 +34,6 @@ withTrelloCredentials p f =
     either (pure . Left) (fmap Right . R.runReaderT f)
 
 
-run = withTrelloCredentials "credentials/trello.yaml"
-
-
 main :: IO ()
 main = do
   describe program >>= print
@@ -45,81 +41,120 @@ main = do
   withTrelloCredentials "credentials/trello.yaml" $ do
     runExceptT (describeVerbose program) >>= liftIO . print
     runExceptT (describeBoth program) >>= liftIO . print
-    -- runSilent program >>= liftIO . print
-    -- runDescribe program >>= liftIO . print
-  >>= print
+    runSilent program >>= liftIO . print
+    runExceptT (runExceptT (runDescribe program)) >>= liftIO . print
+    pure ()
+  >>= either print (const (print ("done" :: String)))
 
   where
     describe :: (MonadIO m) => TrelloP a -> m a
-    describe = trelloToDescribeI >---> execDescribe
+    describe = t2d >---> d2io
 
 
-    -- describeVerbose :: (MonadIO m, R.MonadReader TrelloAuth m) => TrelloP a -> m (Either TrelloError a)
-    describeVerbose :: (MonadIO m, R.MonadReader TrelloAuth m) => TrelloP a -> ExceptT TrelloError m a
-    describeVerbose p = do
-      auth <- lift R.ask
-      (z auth  . foldFree g) p
+    describeVerbose :: (MonadIO m) => TrelloP a -> ExceptT TrelloError (R.ReaderT TrelloAuth m) a
+    describeVerbose
+      -- =  (\p' ->  k3 `R.mapReaderT` k2 p') `mapExceptT` k1 p
+      =  mapExceptT (R.mapReaderT k3 . k2) . k1
 
       where
-         describeReq :: (MonadIO m) => t -> HttpUriP t b -> m b
-         describeReq x = httpUriToDescribe x >---> execDescribe
-
-         z :: (MonadIO m) => t -> ExceptT e (HttpUriP t) b -> ExceptT e m b
-         z = mapExceptT . describeReq
-
-         g :: TrelloF a -> ExceptT TrelloError (HttpUriP TrelloAuth) a
-         g = ExceptT . trelloToNetworkI
+        k1 :: TrelloP a -> ExceptT TrelloError (HttpUriP TrelloAuth) a
+        k1 = foldFree t2h
+        k2 :: HttpUriP x a -> R.ReaderT x DescribeP a
+        k2 = foldFree h2dr
+        k3 :: (MonadIO m) => DescribeP a -> m a
+        k3 = foldFree d2io
 
 
     describeBoth :: (MonadIO m, R.MonadReader TrelloAuth m) => TrelloP a -> ExceptT TrelloError m a
     describeBoth p = do
       auth <- lift R.ask
 
-      ( foldFree (\t -> case t of ; (L x) -> d2io x ; (R x) -> d2io x)
-        . foldFree (\c -> liftL (t2d c) >> liftR (t2v c))
-        ) p
+      ( f . g auth) p
+
+      where
+        f :: (MonadIO m) => ExceptT TrelloError (Free (DescribeF :+: DescribeF)) a -> ExceptT TrelloError m a
+        f = mapExceptT (foldFree f1)
+
+        f1 :: (MonadIO m) => (DescribeF :+: DescribeF) a -> m a
+        f1 t = case t of ; (L x) -> d2io x ; (R x) -> d2io x
+
+        g :: TrelloAuth -> TrelloP a -> ExceptT TrelloError (Free (DescribeF :+: DescribeF)) a
+        g auth = ExceptT . (runExceptT . foldFree (ExceptT . k auth) )
+
+        k :: TrelloAuth -> TrelloF a -> Free (DescribeF :+: DescribeF) (Either TrelloError a)
+        k auth c = g1 c >> g2 auth c
+
+        g1 :: TrelloF a -> Free (DescribeF :+: DescribeF) a
+        g1 = liftL . t2d
+
+        g2 :: TrelloAuth -> TrelloF a -> Free (DescribeF :+: DescribeF) (Either TrelloError a)
+        g2 auth = liftR . runExceptT . t2v auth
 
 
     runSilent :: (MonadIO m, R.MonadReader TrelloAuth m) => TrelloP a -> m (Either HttpError (Either TrelloError a))
     runSilent = V.foldEitherFree execHttpUri . V.foldEitherFree trelloToNetworkI
 
 
---     runDescribe :: (MonadIO m, R.MonadReader TrelloAuth m) => TrelloP a -> m (a, Either TrelloError a, Either HttpError (Either TrelloError a))
---     runDescribe p = do
---       r1 <- describe p
---       r2 <- describeVerbose p
---       r3 <- (V.foldEitherFree execHttpUri . V.foldEitherFree trelloToNetworkI) p
---       pure (r1, r2, r3)
---
-t2t :: TrelloF a -> Free TrelloF a
-t2t = identityI
-t2d :: TrelloF a -> Free DescribeF a
+    -- describe, verbose and run
+    runDescribe :: (MonadIO m, R.MonadReader TrelloAuth m) => TrelloP a -> T m a
+    runDescribe p = do
+      auth <- lift R.ask
+
+      ( f . g auth) p
+
+      where
+        f :: (MonadIO m, R.MonadReader TrelloAuth m) => ExceptT TrelloError (Free Triple) a -> T m a
+        f = mapExceptT f'
+
+        f' :: (MonadIO m, R.MonadReader TrelloAuth m) => Free Triple a -> ExceptT HttpError m a
+        f' = foldFree f1
+
+        f1 :: (MonadIO m, R.MonadReader TrelloAuth m) => Triple a -> ExceptT HttpError m a
+        f1 t
+          = case t of
+              (L x)     -> d2io x
+              (R (L x)) -> d2io x
+              (R (R x)) -> h2io x
+
+        g :: TrelloAuth -> TrelloP a -> ExceptT TrelloError (Free Triple) a
+        g auth = ExceptT . (runExceptT . foldFree (ExceptT . k auth) )
+
+        k :: TrelloAuth -> TrelloF a -> Free Triple (Either TrelloError a)
+        k auth c = g1 c >> g2 auth c >> g3 c
+
+        g1 :: (Functor f) => TrelloF a -> Free (DescribeF :+: f) a
+        g1 = liftL . t2d
+
+        g2 :: (Functor f, Functor g) => TrelloAuth -> TrelloF a -> Free (f :+: (DescribeF :+: g)) (Either TrelloError a)
+        g2 auth = liftR . liftL . runExceptT . t2v auth
+
+        g3 :: (Functor f, Functor g) => TrelloF a -> Free (f :+: (g :+: HttpUriF TrelloAuth)) (Either TrelloError a)
+        g3 = liftR . liftR . runExceptT . t2h
+
+
+type T m a = ExceptT TrelloError (ExceptT HttpError m) a
+type Triple = (DescribeF :+: (DescribeF :+: HttpUriF TrelloAuth))
+
+
+t2d :: TrelloF a -> DescribeP a
 t2d = trelloToDescribeI
-t2h :: TrelloF a -> ExceptT TrelloError (Free (HttpUriF TrelloAuth)) a
+
+t2h :: TrelloF a -> ExceptT TrelloError (HttpUriP TrelloAuth) a
 t2h = ExceptT . trelloToNetworkI
-t2io :: TrelloF a -> ExceptT TrelloError IO a
-t2io = undefined
-t2v :: TrelloAuth -> TrelloF a -> ExceptT TrelloError (Free DescribeF) a
-t2v auth p = _ (t2h p)  (foldFree (h2d auth))
-h2d :: TrelloAuth -> HttpUriF TrelloAuth a -> Free DescribeF a
+
+t2v :: TrelloAuth -> TrelloF a -> ExceptT TrelloError DescribeP a
+t2v auth p = mapExceptT (foldFree (h2d auth)) (t2h p)
+
+h2d :: t -> HttpUriF t a -> DescribeP a
 h2d = httpUriToDescribe
-h2io :: (MonadIO m, R.MonadReader x m) => HttpUriF x a -> m (Either HttpError a)
-h2io = execHttpUri
-d2io :: DescribeF a -> IO a
+
+h2dr :: HttpUriF x a -> R.ReaderT x DescribeP a
+h2dr p = do
+  x <- R.ask
+  R.lift (httpUriToDescribe x p)
+
+h2io :: (MonadIO m, R.MonadReader x m) => HttpUriF x a -> ExceptT HttpError m a
+h2io = ExceptT . execHttpUri
+
+d2io :: (MonadIO m) => DescribeF a -> m a
 d2io = execDescribe
-
-t2tf :: Free TrelloF a -> Free TrelloF a
-t2tf = foldFree identityI
-t2df :: Free TrelloF a -> Free DescribeF a
-t2df = foldFree trelloToDescribeI
-t2hf :: Free TrelloF a -> ExceptT TrelloError (Free (HttpUriF TrelloAuth)) a
-t2hf = foldFree (ExceptT . trelloToNetworkI)
-t2iof :: Free TrelloF a -> IO a
-t2iof = foldFree undefined
-h2df :: TrelloAuth -> Free ( HttpUriF TrelloAuth ) a -> Free DescribeF a
-h2df auth = foldFree (httpUriToDescribe auth)
-h2iof :: (MonadIO m, R.MonadReader x m) => Free (HttpUriF x) a -> ExceptT HttpError m a
-h2iof = foldFree (ExceptT . execHttpUri)
-d2iof :: Free DescribeF a -> IO a
-d2iof = foldFree execDescribe
-

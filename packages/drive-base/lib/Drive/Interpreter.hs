@@ -93,6 +93,7 @@ combineI
 -- combineI f _ (L t) = f t
 -- combineI _ f (R t) = f t
 
-combineI f g t = case t of
-                   (L x) -> f x
-                   (R x) -> g x
+combineI f g t
+  = case t of
+      (L x) -> f x
+      (R x) -> g x

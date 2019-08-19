@@ -5,9 +5,9 @@ module Main
   ( main
   ) where
 
-import           Drive          ((<--->), (>---<), (>--->))
-import           Drive
 import qualified Drive          as V
+
+import           Drive          ((<--->), (>---<), (>--->))
 import           Drive.Describe
 import           Drive.Terminal
 
@@ -31,15 +31,9 @@ main = do
   where
     describe = t2d >---> d2io
     runTerminal = t2t >---> t2io
-    describeRun :: TerminalP a -> IO a
-    describeRun
-      = foldFree (\t -> case t of
-                          (L x) -> d2io x
-                          (R x) -> t2io x
-                 )
-      . foldFree (\c -> liftL (t2d c) >> liftR (t2t c))
+    describeRun = (t2d <---> t2t) >---> (d2io >---< t2io)
 
-    t2d = terminalToDescribeI
     t2t = V.identityI
-    d2io = execDescribe
+    t2d = terminalToDescribeI
     t2io = execTerminal
+    d2io = execDescribe
