@@ -18,23 +18,24 @@ module Drive.HTTP.Handlers
   ) where
 
 import qualified Control.Exception      as E
-import           Control.Lens           ((^.))
 import qualified Control.Monad.IO.Class as IOC
-import           Control.Monad.Reader
 import qualified Data.ByteString.Lazy   as D
-import           Data.Semigroup         ((<>))
 import qualified Data.Text              as Text
-import           Drive
+import qualified Network.Wreq           as W
+
+import           Control.Lens           ((^.))
+import           Control.Monad.Reader
+import           Data.Semigroup         ((<>))
 import           Drive.Describe
 import           Drive.HTTP.Types
 import           Network.HTTP.Client    (HttpException)
-import qualified Network.Wreq           as W
 import           Network.Wreq.Lens
+
 
 type SupportsNetwork m = (IOC.MonadIO m)
 
 
-httpToDescribe :: HttpF b -> Free DescribeF b
+httpToDescribe :: HttpF b -> DescribeP b
 httpToDescribe (Get _o u a)
   = a D.empty <$ verbose message
     where
@@ -45,7 +46,7 @@ httpUriToDescribe
   :: forall t b.
      t
   -> HttpUriF t b
-  -> Free DescribeF b
+  -> DescribeP b
 
 httpUriToDescribe x (GetUri _o u a)
   = a (Left NoContent) <$ verbose (message x)
@@ -53,7 +54,7 @@ httpUriToDescribe x (GetUri _o u a)
       message y = "getting \"" <> Text.pack (u y <> "\"")
 
 
-httpHeaderToDescribe :: t -> HttpHeaderF t b -> Free DescribeF b
+httpHeaderToDescribe :: t -> HttpHeaderF t b -> DescribeP b
 httpHeaderToDescribe x (GetOptions o u a)
   = a D.empty <$ verbose (message x)
     where
