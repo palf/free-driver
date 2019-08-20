@@ -7,3 +7,4 @@ resources
 *.log
 credentials
 write-example.txt
+**/*.cabal
